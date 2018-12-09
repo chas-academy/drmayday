@@ -172,7 +172,7 @@ module Mayday = {
     let event: Event.event =
       Json.Decode.{
         channel: json |> field("channel_id", string),
-        command: Commands.Help,
+        command: Commands.Mayday,
         subtype: json |> SubType.decode,
         text: json |> field("text", string),
         user: json |> field("user_id", string),
