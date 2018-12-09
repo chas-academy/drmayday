@@ -1,1 +1,0 @@
-let userId = id => "<@" ++ id ++ ">";
