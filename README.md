@@ -1,18 +1,23 @@
-# Basic Reason Template
+# Dr. Mayday - WIP
 
-Hello! This project allows you to quickly get started with Reason and BuckleScript. If you wanted a more sophisticated version, try the `react` template (`bsb -theme react -init .`).
-
-# Build
-```
-npm run build
-```
-
-# Build + Watch
+## Getting started
 
 ```
-npm run start
+git clone git@github.com:chas-academy/drmayday.git
+cd drmayday
+npm install
 ```
 
+See `.env.template` for env-variables.
 
-# Editor
-If you use `vscode`, Press `Windows + Shift + B` it will build automatically
+To start live-compiling ReasonML to Javascript run:
+`npm start`
+then in another terminal run:
+`npm run dev`
+to fire up the Express-server.
+
+## Standards
+
+- [Semantic commits](https://gist.github.com/lessp/7af7ca9e3a2f3508755dcddfcbc1f15d)
+
+## ... more to come
