@@ -30,6 +30,17 @@ CREATE TABLE `help_items` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 ```
 
+## How To Use
+
+## Available commands
+
+| Command                | Privilegies | Description                   |
+| ---------------------- | ----------- | ----------------------------- |
+| `help`                 | `*`         | Display the help text         |
+| `mayday <Description>` | `Student`   | Add yourself to the help list |
+| `next`                 | `Teacher`   | Mark help-item as finished    |
+| `queue`                | `*`         | Show the current queue        |
+
 ## Standards
 
 - [Semantic commits](https://gist.github.com/lessp/7af7ca9e3a2f3508755dcddfcbc1f15d)
