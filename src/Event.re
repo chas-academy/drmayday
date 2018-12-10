@@ -10,30 +10,21 @@ let handleEvent = event => {
          switch (subtype) {
          | Human =>
            switch (command) {
-           | Help =>
-             Slack.Message.send(channel, Slack.Message.helpMessage) |> ignore
+           | Help => sendMessage(Slack.Message.helpMessage) |> ignore
            | Mayday =>
              isAdmin ?
-               Slack.Message.send(
-                 channel,
-                 "Hey, this is restricted to students!",
-               )
-               |> ignore :
-               Database.addHelpItem(user, text, sendMessage) |> ignore
+               sendMessage("Hey, this is restricted to students!") |> ignore :
+               Database.addHelpItem(user, text, sendMessageWithAttachments)
            | Next =>
-             isAdmin ?
+             !isAdmin ?
                Database.getFirstHelpItem(
                  sendMessage,
                  sendMessageWithAttachments,
                )
                |> ignore :
-               Slack.Message.send(
-                 channel,
-                 "Hey, this is restricted to teachers!",
-               )
-               |> ignore
+               sendMessage("Hey, this is restricted to teachers!") |> ignore
            | Queue => Database.getOpenItems(sendMessage) |> ignore
-           | _ => Slack.Message.send(channel, "Unknown command..") |> ignore
+           | _ => sendMessage("Unknown command..") |> ignore
            }
          | Bot => ()
          };

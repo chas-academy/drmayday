@@ -111,18 +111,23 @@ module Event = {
 
 module Action = {
   type actions =
+    | Keep
     | Remove
+    | SelectRoom
     | UnknownAction;
 
   let decodeAction = action =>
     switch (action) {
+    | "keep" => Keep
     | "remove" => Remove
+    | "room_list" => SelectRoom
     | _ => UnknownAction
     };
 
   type actionItem = {
     action: actions,
-    itemId: option(string),
+    value: option(string),
+    selectedOption: option(string),
   };
 
   type t = {
@@ -143,7 +148,8 @@ module Action = {
   let actionItemToRecord = json =>
     Json.Decode.{
       action: json |> field("name", string) |> decodeAction,
-      itemId: json |> optional(field("value", string)),
+      value: json |> optional(field("value", string)),
+      selectedOption: json |> optional(field("selected_options", string)),
     };
 
   let actionToRecord = json =>
@@ -215,7 +221,7 @@ module Message = {
 
   let confirmQueueRemoval = itemId => {j|[
     {
-      "fallback": "Seems like your interface does not suppor attachments.",
+      "fallback": "Seems like your interface does not support attachments.",
       "callback_id": "confirm_finished",
       "color": "#3AA3E3",
       "attachment_type": "default",
@@ -234,6 +240,33 @@ module Message = {
         },
       ],
     },
+  ]
+  |j};
+
+  let specifyRoom = itemId => {j|[
+  {
+    "fallback": "Seems like your interface does not support attachments.",
+    "callback_id": "specify_room",
+    "color": "#3AA3E3",
+    "attachment_type": "default",
+    "callback_id": "$itemId",
+    "actions": [
+      {
+        "name": "room_list",
+        "text": "Select room...",
+        "type": "select",
+        "options": [
+          {"text": "Föreläsningssalen", "value": "lounge"},
+          {"text": "Första grupprummet", "value": "group_room_1"},
+          {"text": "Andra grupprummet", "value": "group_room_2"},
+          {"text": "Tredje grupprummet", "value": "group_room_3"},
+          {"text": "Fjärde grupprummet", "value": "group_room_4"},
+          {"text": "Manowar-rummet", "value": "manowar_room"},
+          {"text": "Köket", "value": "kitchen"}
+        ]
+      }
+    ]
+  }
   ]
   |j};
 

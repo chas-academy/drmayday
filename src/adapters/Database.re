@@ -10,6 +10,7 @@ type helpItem = {
   id: int,
   userId: string,
   description: string,
+  room: option(string),
   timeCreated: float,
   timeClosed: option(float),
   finished: bool,
@@ -22,6 +23,7 @@ module Decode = {
     id: json |> field("id", int),
     userId: json |> field("user_id", string),
     description: json |> field("description", string),
+    room: json |> optional(field("room", string)),
     timeCreated: json |> field("time_created", Json.Decode.float),
     timeClosed: json |> optional(field("time_closed", Json.Decode.float)),
     finished:
@@ -42,7 +44,7 @@ let connect = () =>
     (),
   );
 
-let addHelpItem = (userId, description, sendMessage) => {
+let addHelpItem = (userId, description, sendMessageWithAttachments) => {
   let conn = connect();
   let timestamp = Js.Date.now();
 
@@ -65,14 +67,43 @@ let addHelpItem = (userId, description, sendMessage) => {
     res => {
       switch (res) {
       | `Error(e) => Js.log2("ERROR: ", e)
-      | `Select(select) =>
-        Js.log2("SELECT: ", select);
-        sendMessage(
-          "Cool, I've added you to the queue"
-          ++ Slack.Utils.encodeUserId(userId),
-        )
-        |> ignore;
+      | `Select(select) => Js.log2("SELECT: ", select)
       | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
+      };
+
+      sendMessageWithAttachments(
+        "OK, I've added you to the queue, but please tell me which room you're in: "
+        ++ Slack.Utils.encodeUserId(userId),
+        Slack.Message.specifyRoom(userId),
+      )
+      |> ignore;
+
+      MySql2.Connection.close(conn);
+    },
+  );
+};
+
+let addRoom = (itemId, room, sendMessage) => {
+  let conn = connect();
+
+  let params =
+    MySql2.Params.named(
+      Json.Encode.(
+        object_([("id", int(itemId)), ("room", string(room))])
+      ),
+    );
+
+  MySql2.execute(
+    conn,
+    "UPDATE help_items SET room = :room WHERE id = :id",
+    Some(params),
+    res => {
+      switch (res) {
+      | `Error(e) => Js.log2("ERROR: ", e)
+      | `Select(select) => Js.log2("SELECT: ", select)
+      | `Mutation(mutation) =>
+        Js.log2("MUTATION: ", mutation);
+        sendMessage("Sweet, you're in the queue!") |> ignore;
       };
 
       MySql2.Connection.close(conn);
@@ -166,7 +197,7 @@ let getOpenItems = sendMessage => {
           switch (Belt.Array.length(rows)) {
           | 0 => "Woot. No one on the help list? Nice work!"
           | _ =>
-            "*Here's the current list of patients*\n\n"
+            "*Here's the current list of patients:*\n\n"
             ++ (
               rows
               ->Belt.Array.mapWithIndex(
