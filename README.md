@@ -10,10 +10,12 @@ npm install
 
 See `.env.template` for env-variables.
 
-To start live-compiling ReasonML to Javascript run:
-`npm start`
-then in another terminal run:
-`npm run dev`
+- Slack token is found under `Features -> OAuth & Permissions -> Bot User OAuth Access Token`
+
+To start live-compiling ReasonML to Javascript run: 
+`npm start` 
+then in another terminal run: 
+`npm run dev` 
 to fire up the Express-server.
 
 ### DB
@@ -23,12 +25,23 @@ CREATE TABLE `help_items` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
+  `room` varchar(255) DEFAULT NULL,
   `time_created` double DEFAULT NULL,
   `time_closed` double DEFAULT NULL,
   `finished` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 ```
+
+### Slack
+
+The easiest way to get up and running is to use ngrok pointed against the dev-server (eg. `ngrok http 4000`)
+
+You'll need to change the host-adress at the following locations in the Slack API.
+
+- actions: `Features -> Interactive Components` 
+- event: `Features -> Event Subscriptions` 
+- mayday (/mayday): `Features -> Slash Commands` 
 
 ## How To Use
 
