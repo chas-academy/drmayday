@@ -7,7 +7,8 @@
     "server": "node lib/js/src/Server.bs.js",
     "start": "bsb -make-world -w",
     "clean": "bsb -clean-world",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "test:once": "jest"
   },
   "keywords": [
     "BuckleScript"
@@ -18,7 +19,8 @@
     "@ahrefs/bs-dotenv": "^1.0.3",
     "@glennsl/bs-jest": "^0.4.5",
     "bs-axios": "0.0.39",
-    "bs-platform": "^4.0.6"
+    "bs-platform": "^4.0.6",
+    "husky": "^1.3.1"
   },
   "dependencies": {
     "@glennsl/bs-json": "^3.0.0",
@@ -27,5 +29,11 @@
     "bs-mysql2": "^8.2.1",
     "date-fns": "^1.29.0",
     "dotenv": "^6.1.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run test:once",
+      "pre-push": "npm run test:once"
+    }
   }
 }
