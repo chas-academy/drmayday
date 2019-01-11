@@ -199,18 +199,17 @@ let getOpenItems = sendMessage => {
           | _ =>
             "*Here's the current list of patients:*\n\n"
             ++ (
-              rows
-              ->Belt.Array.mapWithIndex(
-                  (i, {userId, description, timeCreated}) =>
-                  "*"
-                  ++ string_of_int(i + 1)
-                  ++ "*. "
-                  ++ Slack.Utils.encodeUserId(userId)
-                  ++ " - "
-                  ++ description
-                  ++ " - "
-                  ++ Utils.formatTimestamp(timeCreated)
-                )
+              rows->Belt.Array.mapWithIndex(
+                (i, {userId, description, timeCreated}) =>
+                "*"
+                ++ string_of_int(i + 1)
+                ++ "*. "
+                ++ Slack.Utils.encodeUserId(userId)
+                ++ " - "
+                ++ description
+                ++ " - "
+                ++ Utils.formatTimestamp(timeCreated)
+              )
               |> Js.Array.joinWith("\n")
             )
           }
@@ -225,26 +224,35 @@ let getOpenItems = sendMessage => {
   );
 };
 
-let hasUnfinishedHelpItem = userId => {
-  let conn = connect();
+let hasUnfinishedHelpItem = userId =>
+  Js.Promise.make((~resolve, ~reject as _) => {
+    let conn = connect();
 
-  let params =
-    MySql2.Params.named(
-      Json.Encode.(object_([("user_id", string(userId))])),
+    let params =
+      MySql2.Params.named(
+        Json.Encode.(object_([("user_id", string(userId))])),
+      );
+
+    MySql2.execute(
+      conn,
+      "SELECT * FROM help_items WHERE user_id = :user_id AND finished = false",
+      Some(params),
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) =>
+          let rows =
+            select
+            ->MySql2.Select.rows
+            ->Belt.Array.map(item => item |> Decode.helpItem);
+          switch (Array.length(rows)) {
+          | 0 => resolve(. false)
+          | _ => resolve(. true)
+          };
+        | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
+        };
+
+        MySql2.Connection.close(conn);
+      },
     );
-
-  MySql2.execute(
-    conn,
-    "SELECT * FROM help_items WHERE user_id = :user_id AND finished = false",
-    Some(params),
-    res => {
-      switch (res) {
-      | `Error(e) => Js.log2("ERROR: ", e)
-      | `Select(select) => Js.log2("SELECT: ", select)
-      | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
-      };
-
-      MySql2.Connection.close(conn);
-    },
-  );
-};
+  });

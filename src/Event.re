@@ -1,5 +1,6 @@
 let handleEvent = event => {
   let {user, text, command, channel, subtype}: Slack.Event.event = event;
+
   Js.Promise.(
     Slack.IO.isAdmin(user)
     |> then_(isAdmin => {
@@ -14,7 +15,21 @@ let handleEvent = event => {
            | Mayday =>
              isAdmin ?
                sendMessage("Hey, this is restricted to students!") |> ignore :
-               Database.addHelpItem(user, text, sendMessageWithAttachments)
+               user
+               |> Database.hasUnfinishedHelpItem
+               |> then_(hasUnfinished => {
+                    hasUnfinished ?
+                      sendMessage("You're already on the help list!")
+                      |> ignore :
+                      Database.addHelpItem(
+                        user,
+                        text,
+                        sendMessageWithAttachments,
+                      );
+
+                    resolve();
+                  })
+               |> ignore
            | Next =>
              !isAdmin ?
                Database.getFirstHelpItem(
