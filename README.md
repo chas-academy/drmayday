@@ -1,6 +1,14 @@
 # Dr. Mayday - WIP
 
-## Getting started
+## Table of Contents
+
+1. [Getting started](#getting-started)
+   - [DB](#db)
+   - [Slack](#slack)
+2. [Usage](#usage)
+3. [Standard](#standards)
+
+## [Getting started](#getting-started)
 
 ```
 git clone git@github.com:chas-academy/drmayday.git
@@ -18,7 +26,7 @@ then in another terminal run:
 `npm run dev`
 to fire up the Express-server.
 
-### DB
+### [DB](#db)
 
 ```
 CREATE TABLE `help_items` (
@@ -33,7 +41,7 @@ CREATE TABLE `help_items` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 ```
 
-### Slack
+### [Slack](#slack)
 
 The easiest way to get up and running is to use ngrok pointed against the dev-server (eg. `ngrok http 4000`)
 
@@ -43,7 +51,7 @@ You'll need to change the host-adress at the following locations in the Slack AP
 - event: `Features -> Event Subscriptions`
 - mayday (/mayday): `Features -> Slash Commands`
 
-## How To Use
+## [How To Use](#usage)
 
 ## Available commands
 
@@ -54,7 +62,7 @@ You'll need to change the host-adress at the following locations in the Slack AP
 | `next`                   | `Teacher`   | Mark help-item as finished    |
 | `queue|q`                | `*`         | Show the current queue        |
 
-## Standards
+## [Standard](#standards)
 
 - [Semantic commits](https://gist.github.com/lessp/7af7ca9e3a2f3508755dcddfcbc1f15d)
 
