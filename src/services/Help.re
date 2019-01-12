@@ -14,3 +14,11 @@ let mayday = (text, user, isAdmin, sendMessage, sendMessageWithAttachments) => {
       |> ignore
   );
 };
+
+let selectRoom = (selectOption, itemId, sendMessage) => {
+  switch (selectOption) {
+  | Some(room) =>
+    Database.addRoom(int_of_string(itemId), List.hd(room), sendMessage)
+  | None => ()
+  };
+};

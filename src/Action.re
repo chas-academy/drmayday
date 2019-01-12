@@ -5,21 +5,8 @@ let handleAction = actionObj => {
 
   actions->Belt.Array.map(({action, value, selectedOption}) =>
     switch (action) {
-    | Remove =>
-      switch (value) {
-      | Some(id) => Database.closeHelpItem(int_of_string(id))
-      | None => ()
-      }
-    | SelectRoom =>
-      switch (selectedOption) {
-      | Some(room) =>
-        Database.addRoom(
-          int_of_string(callbackId),
-          List.hd(room),
-          sendMessage,
-        )
-      | None => ()
-      }
+    | Remove => Queue.markAsFinished(value)
+    | SelectRoom => Help.selectRoom(selectedOption, callbackId, sendMessage)
     | _ => ()
     }
   )

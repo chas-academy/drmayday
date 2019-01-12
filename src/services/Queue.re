@@ -29,3 +29,10 @@ let next = (isAdmin, sendMessage, sendMessageWithAttachments) => {
 
 let getOpenItems = sendMessage =>
   Database.getOpenItems(sendMessage) |> ignore;
+
+let markAsFinished = itemId => {
+  switch (itemId) {
+  | Some(id) => Database.closeHelpItem(int_of_string(id))
+  | None => ()
+  };
+};
