@@ -135,6 +135,7 @@ module Action = {
   type t = {
     actions: array(actionItem),
     callbackId: string,
+    channel: string,
   };
 
   type actionType =
@@ -160,6 +161,7 @@ module Action = {
     Json.Decode.{
       actions: json |> field("actions", array(actionItemToRecord)),
       callbackId: json |> field("callback_id", string),
+      channel: json |> at(["channel", "id"], string),
     };
 
   let decodeActionBody = json =>

@@ -111,36 +111,39 @@ let addRoom = (itemId, room, sendMessage) => {
   );
 };
 
-let closeHelpItem = itemId => {
-  let conn = connect();
-  let timeClosed = Js.Date.now();
+let closeHelpItem = itemId =>
+  Js.Promise.make((~resolve, ~reject as _reject) => {
+    let conn = connect();
+    let timeClosed = Js.Date.now();
 
-  let params =
-    MySql2.Params.named(
-      Json.Encode.(
-        object_([
-          ("id", int(itemId)),
-          ("time_closed", Json.Encode.float(timeClosed)),
-          ("finished", bool(true)),
-        ])
-      ),
+    let params =
+      MySql2.Params.named(
+        Json.Encode.(
+          object_([
+            ("id", int(itemId)),
+            ("time_closed", Json.Encode.float(timeClosed)),
+            ("finished", bool(true)),
+          ])
+        ),
+      );
+
+    MySql2.execute(
+      conn,
+      "UPDATE help_items SET time_closed = :time_closed, finished = :finished WHERE id = :id",
+      Some(params),
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) => Js.log2("SELECT: ", select)
+        | `Mutation(mutation) =>
+          Js.log2("MUTATION: ", mutation);
+          resolve(. true);
+        };
+
+        MySql2.Connection.close(conn);
+      },
     );
-
-  MySql2.execute(
-    conn,
-    "UPDATE help_items SET time_closed = :time_closed, finished = :finished WHERE id = :id",
-    Some(params),
-    res => {
-      switch (res) {
-      | `Error(e) => Js.log2("ERROR: ", e)
-      | `Select(select) => Js.log2("SELECT: ", select)
-      | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
-      };
-
-      MySql2.Connection.close(conn);
-    },
-  );
-};
+  });
 
 let getFirstHelpItem = () =>
   Js.Promise.make((~resolve, ~reject as _reject) => {

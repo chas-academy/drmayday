@@ -1,11 +1,11 @@
 let handleAction = actionObj => {
-  let {actions, callbackId}: Slack.Action.t = actionObj;
+  let {actions, callbackId, channel}: Slack.Action.t = actionObj;
 
-  let sendMessage = Slack.Message.send("");
+  let sendMessage = Slack.Message.send(channel);
 
   actions->Belt.Array.map(({action, value, selectedOption}) =>
     switch (action) {
-    | Remove => Queue.markAsFinished(value)
+    | Remove => Queue.markAsFinished(value, sendMessage)
     | SelectRoom => Help.selectRoom(selectedOption, callbackId, sendMessage)
     | _ => ()
     }

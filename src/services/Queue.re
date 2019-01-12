@@ -1,5 +1,5 @@
 let next = (isAdmin, sendMessage, sendMessageWithAttachments) => {
-  isAdmin ?
+  !isAdmin ?
     {
       Js.Promise.(
         Database.getFirstHelpItem()
@@ -7,14 +7,14 @@ let next = (isAdmin, sendMessage, sendMessageWithAttachments) => {
              switch (item) {
              | Some((helpItem: Database.helpItem)) =>
                sendMessageWithAttachments(
-                 "Remove "
+                 "Really remove "
                  ++ Slack.Utils.encodeUserId(helpItem.userId)
-                 ++ " from the queue?",
+                 ++ " from the queue? Have they received help?",
                  Slack.Message.confirmQueueRemoval(helpItem.id),
                )
                |> ignore
              | None =>
-               "There's no one next in line! Nice work!"
+               "There's no one next in line! Nice work! :tada:"
                |> sendMessage
                |> ignore
              };
@@ -30,9 +30,42 @@ let next = (isAdmin, sendMessage, sendMessageWithAttachments) => {
 let getOpenItems = sendMessage =>
   Database.getOpenItems(sendMessage) |> ignore;
 
-let markAsFinished = itemId => {
-  switch (itemId) {
-  | Some(id) => Database.closeHelpItem(int_of_string(id))
-  | None => ()
-  };
+let markAsFinished = (itemId, sendMessage) => {
+  Js.Promise.(
+    switch (itemId) {
+    | Some(id) =>
+      Database.closeHelpItem(int_of_string(id))
+      |> then_(_del => {
+           Database.getFirstHelpItem()
+           |> then_(item => {
+                switch (item) {
+                | Some((helpItem: Database.helpItem)) =>
+                  sendMessage(
+                    "Ok, "
+                    ++ Slack.Utils.encodeUserId(helpItem.userId)
+                    ++ " is next in line. They're "
+                    ++ (
+                      switch (helpItem.room) {
+                      | Some(r) =>
+                        "in " ++ Slack.Message.parseRoom(r) ++ " :runner:"
+                      | None => " somewhere. :thinking_face:"
+                      }
+                    ),
+                  )
+                  |> ignore
+                | None =>
+                  "No one next in line! Nice work! :clap:"
+                  |> sendMessage
+                  |> ignore
+                };
+                resolve();
+              })
+           |> ignore;
+
+           resolve(true);
+         })
+      |> ignore
+    | None => ()
+    }
+  );
 };
