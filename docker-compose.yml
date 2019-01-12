@@ -1,0 +1,38 @@
+# Use root/example as user/password credentials
+version: "3.1"
+
+services:
+  drmayday:
+    image: ekander/drmayday:latest
+    ports:
+      - 80:4000
+    networks:
+      - drmayday
+    environment:
+      - SLACK_TOKEN=${SLACK_TOKEN}
+
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      - drmayday
+    environment:
+      - MYSQL_DATABASE=drmayday
+      - MYSQL_USER=drmayday
+      - MYSQL_PASSWORD=test
+      - MYSQL_ROOT_PASSWORD=test
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - drmayday
+    ports:
+      - 8080:8080
+
+networks:
+  drmayday:
