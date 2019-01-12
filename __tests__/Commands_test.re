@@ -7,6 +7,10 @@ describe("#Slack.Commands", () =>
         expect(Commands.decodeCommand("help")) |> toEqual(Commands.Help)
       );
 
+      test("m", () =>
+        expect(Commands.decodeCommand("m")) |> toEqual(Commands.Mayday)
+      );
+
       test("mayday", () =>
         expect(Commands.decodeCommand("mayday")) |> toEqual(Commands.Mayday)
       );

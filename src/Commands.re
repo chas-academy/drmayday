@@ -18,6 +18,7 @@ type commands =
 let decodeCommand = text =>
   switch (text |> Utils.parseCommand) {
   | "help" => Help
+  | "m"
   | "mayday" => Mayday
   | "next" => Next
   | "next!" => NextForce
