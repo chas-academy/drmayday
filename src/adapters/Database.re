@@ -151,7 +151,7 @@ let getFirstHelpItem = () =>
 
     MySql2.execute(
       conn,
-      "SELECT * from help_items WHERE finished = false ORDER BY time_created DESC LIMIT 1",
+      "SELECT * from help_items WHERE finished = false ORDER BY time_created ASC LIMIT 1",
       None,
       res => {
         switch (res) {
@@ -179,7 +179,7 @@ let getOpenItems = sendMessage => {
 
   MySql2.execute(
     conn,
-    "SELECT * from help_items WHERE finished = false ORDER BY time_created DESC",
+    "SELECT * from help_items WHERE finished = false ORDER BY time_created ASC",
     None,
     res => {
       switch (res) {
