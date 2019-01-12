@@ -68,15 +68,15 @@ let addHelpItem = (userId, description, sendMessageWithAttachments) => {
       switch (res) {
       | `Error(e) => Js.log2("ERROR: ", e)
       | `Select(select) => Js.log2("SELECT: ", select)
-      | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
+      | `Mutation(mutation) =>
+        Js.log2("MUTATION: ", mutation);
+        sendMessageWithAttachments(
+          "OK, I've added you to the queue, but please tell me which room you're in: "
+          ++ Slack.Utils.encodeUserId(userId),
+          Slack.Message.specifyRoom(mutation |> MySql2.Mutation.insertId),
+        )
+        |> ignore;
       };
-
-      sendMessageWithAttachments(
-        "OK, I've added you to the queue, but please tell me which room you're in: "
-        ++ Slack.Utils.encodeUserId(userId),
-        Slack.Message.specifyRoom(userId),
-      )
-      |> ignore;
 
       MySql2.Connection.close(conn);
     },
@@ -142,41 +142,34 @@ let closeHelpItem = itemId => {
   );
 };
 
-let getFirstHelpItem = (sendMessage, sendMessageWithAttachments) => {
-  let conn = connect();
+let getFirstHelpItem = () =>
+  Js.Promise.make((~resolve, ~reject as _reject) => {
+    let conn = connect();
 
-  MySql2.execute(
-    conn,
-    "SELECT * from help_items WHERE finished = false ORDER BY time_created DESC LIMIT 1",
-    None,
-    res => {
-      switch (res) {
-      | `Error(e) => Js.log2("ERROR: ", e)
-      | `Select(select) =>
-        let rows =
-          select
-          ->MySql2.Select.rows
-          ->Belt.Array.map(item => item |> Decode.helpItem);
+    MySql2.execute(
+      conn,
+      "SELECT * from help_items WHERE finished = false ORDER BY time_created DESC LIMIT 1",
+      None,
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) =>
+          let rows =
+            select
+            ->MySql2.Select.rows
+            ->Belt.Array.map(item => item |> Decode.helpItem);
 
-        switch (Belt.Array.length(rows)) {
-        | 0 =>
-          "There's no one next in line! Nice work!" |> sendMessage |> ignore
-        | _ =>
-          sendMessageWithAttachments(
-            "Remove "
-            ++ Slack.Utils.encodeUserId(rows[0].userId)
-            ++ " from the queue?",
-            Slack.Message.confirmQueueRemoval(rows[0].id),
-          )
-          |> ignore
+          switch (Belt.Array.length(rows)) {
+          | 0 => resolve(. None)
+          | _ => resolve(. Some(rows[0]))
+          };
+        | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
         };
-      | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
-      };
 
-      MySql2.Connection.close(conn);
-    },
-  );
-};
+        MySql2.Connection.close(conn);
+      },
+    );
+  });
 
 let getOpenItems = sendMessage => {
   let conn = connect();
@@ -200,7 +193,7 @@ let getOpenItems = sendMessage => {
             "*Here's the current list of patients:*\n\n"
             ++ (
               rows->Belt.Array.mapWithIndex(
-                (i, {userId, description, timeCreated}) =>
+                (i, {userId, description, room, timeCreated}) =>
                 "*"
                 ++ string_of_int(i + 1)
                 ++ "*. "
@@ -209,6 +202,12 @@ let getOpenItems = sendMessage => {
                 ++ description
                 ++ " - "
                 ++ Utils.formatTimestamp(timeCreated)
+                ++ (
+                  switch (room) {
+                  | Some(r) => " in *" ++ Slack.Message.parseRoom(r) ++ "*"
+                  | None => ""
+                  }
+                )
               )
               |> Js.Array.joinWith("\n")
             )

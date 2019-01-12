@@ -32,10 +32,24 @@ let handleEvent = event => {
                |> ignore
            | Next =>
              !isAdmin ?
-               Database.getFirstHelpItem(
-                 sendMessage,
-                 sendMessageWithAttachments,
-               )
+               Database.getFirstHelpItem()
+               |> then_(item => {
+                    switch (item) {
+                    | Some((helpItem: Database.helpItem)) =>
+                      sendMessageWithAttachments(
+                        "Remove "
+                        ++ Slack.Utils.encodeUserId(helpItem.userId)
+                        ++ " from the queue?",
+                        Slack.Message.confirmQueueRemoval(helpItem.id),
+                      )
+                      |> ignore
+                    | None =>
+                      "There's no one next in line! Nice work!"
+                      |> sendMessage
+                      |> ignore
+                    };
+                    resolve();
+                  })
                |> ignore :
                sendMessage("Hey, this is restricted to teachers!") |> ignore
            | Queue => Database.getOpenItems(sendMessage) |> ignore

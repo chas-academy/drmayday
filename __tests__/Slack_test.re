@@ -73,6 +73,32 @@ describe("#Slack.Event", () => {
     })
   );
 
+  describe("#roomSelection", () =>
+    test("parses", () => {
+      let mockActionItem =
+        {|
+      {
+        "name": "room_list",
+        "type": "select",
+        "selected_options": [
+          { "value": "manowar_room" },
+          { "value": "kitchen" }
+        ]
+      }
+      |}
+        |> Json.parseOrRaise;
+
+      let expected: Slack.Action.actionItem = {
+        action: SelectRoom,
+        value: None,
+        selectedOption: Some(["manowar_room", "kitchen"]),
+      };
+
+      expect(mockActionItem |> Slack.Action.actionItemToRecord)
+      |> toEqual(expected);
+    })
+  );
+
   describe("#userId", () =>
     test("should a parsed user id", () =>
       expect(Slack.Utils.encodeUserId("AB123")) |> toEqual("<@AB123>")

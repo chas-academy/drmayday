@@ -127,8 +127,10 @@ module Action = {
   type actionItem = {
     action: actions,
     value: option(string),
-    selectedOption: option(string),
+    selectedOption: option(list(string)),
   };
+
+  let decodeSelected = json => Json.Decode.(json |> field("value", string));
 
   type t = {
     actions: array(actionItem),
@@ -145,12 +147,14 @@ module Action = {
     | _ => UnknownAction
     };
 
-  let actionItemToRecord = json =>
+  let actionItemToRecord = json => {
     Json.Decode.{
       action: json |> field("name", string) |> decodeAction,
       value: json |> optional(field("value", string)),
-      selectedOption: json |> optional(field("selected_options", string)),
+      selectedOption:
+        json |> optional(field("selected_options", list(decodeSelected))),
     };
+  };
 
   let actionToRecord = json =>
     Json.Decode.{
@@ -269,6 +273,18 @@ module Message = {
   }
   ]
   |j};
+
+  let parseRoom = room =>
+    switch (room) {
+    | "lounge" => "Föreläsningssalen"
+    | "group_room_1" => "Första grupprummet"
+    | "group_room_2" => "Andra grupprummet"
+    | "group_room_3" => "Tredje grupprummet"
+    | "group_room_4" => "Fjärde grupprummet"
+    | "manowar_room" => "Manowar-rummet"
+    | "kitchen" => "Köket"
+    | _ => "Något utav alla rum..."
+    };
 
   let helpMessage =
     [
