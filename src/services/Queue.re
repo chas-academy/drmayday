@@ -43,7 +43,9 @@ let markAsFinished = (itemId, sendMessage) => {
                   sendMessage(
                     "Ok, "
                     ++ Slack.Utils.encodeUserId(helpItem.userId)
-                    ++ " is next in line. They're "
+                    ++ " is next in line. The topic is: "
+                    ++ helpItem.description
+                    ++ "\nThey're "
                     ++ (
                       switch (helpItem.room) {
                       | Some(r) =>
