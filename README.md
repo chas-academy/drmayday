@@ -12,10 +12,10 @@ See `.env.template` for env-variables.
 
 - Slack token is found under `Features -> OAuth & Permissions -> Bot User OAuth Access Token`
 
-To start live-compiling ReasonML to Javascript run: 
-`npm start` 
-then in another terminal run: 
-`npm run dev` 
+To start live-compiling ReasonML to Javascript run:
+`npm start`
+then in another terminal run:
+`npm run dev`
 to fire up the Express-server.
 
 ### DB
@@ -39,20 +39,20 @@ The easiest way to get up and running is to use ngrok pointed against the dev-se
 
 You'll need to change the host-adress at the following locations in the Slack API.
 
-- actions: `Features -> Interactive Components` 
-- event: `Features -> Event Subscriptions` 
-- mayday (/mayday): `Features -> Slash Commands` 
+- actions: `Features -> Interactive Components`
+- event: `Features -> Event Subscriptions`
+- mayday (/mayday): `Features -> Slash Commands`
 
 ## How To Use
 
 ## Available commands
 
-| Command                | Privilegies | Description                   |
-| ---------------------- | ----------- | ----------------------------- |
-| `help`                 | `*`         | Display the help text         |
-| `mayday <Description>` | `Student`   | Add yourself to the help list |
-| `next`                 | `Teacher`   | Mark help-item as finished    |
-| `queue`                | `*`         | Show the current queue        |
+| Command                  | Privilegies | Description                   |
+| ------------------------ | ----------- | ----------------------------- |
+| `help`                   | `*`         | Display the help text         |
+| `mayday|m <Description>` | `Student`   | Add yourself to the help list |
+| `next`                   | `Teacher`   | Mark help-item as finished    |
+| `queue|q`                | `*`         | Show the current queue        |
 
 ## Standards
 
