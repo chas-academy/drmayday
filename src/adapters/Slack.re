@@ -210,9 +210,8 @@ module Verification = {
 };
 
 module Message = {
-  let send = (_channel: string, message: string) =>
-    {"channel": Config.slackBotId, "text": message, "mrkdwn": true}
-    |> IO.sendPayload;
+  let send = (channel: string, message: string) =>
+    {"channel": channel, "text": message, "mrkdwn": true} |> IO.sendPayload;
 
   let sendWithAttachments = (channel: string, message: string, attachments) =>
     {
@@ -291,13 +290,13 @@ module Message = {
       "*Sure, here's the list of the all the current commands! :tada:*\n",
       "\n*Student:*\n",
       "```",
-      "mayday <Description> ___________________ Call for a teacher.",
-      "queue __________________________________ Show the list of patients",
+      "mayday|m <Description> ___________________ Call for a teacher.",
+      "queue|q __________________________________ Show the list of patients",
       "```",
       "\n*Teacher:*\n",
       "```",
-      "next ___________________________________ Get the next in line",
-      "queue __________________________________ Show the list of patients",
+      "next _____________________________________ Get the next in line",
+      "queue|q __________________________________ Show the list of patients",
       "```",
     ]
     |> String.concat("\n");
