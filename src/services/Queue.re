@@ -1,5 +1,5 @@
 let next = (isAdmin, sendMessage, sendMessageWithAttachments) => {
-  !isAdmin ?
+  isAdmin ?
     {
       Js.Promise.(
         Database.getFirstHelpItem()
