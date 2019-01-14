@@ -17,6 +17,8 @@
   "license": "MIT",
   "devDependencies": {
     "@ahrefs/bs-dotenv": "^1.0.3",
+    "@commitlint/cli": "^7.3.1",
+    "@commitlint/config-conventional": "^7.3.1",
     "@glennsl/bs-jest": "^0.4.5",
     "bs-axios": "0.0.39",
     "bs-platform": "^4.0.6",
@@ -32,6 +34,7 @@
   },
   "husky": {
     "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
       "pre-commit": "npm run test:once",
       "pre-push": "npm run test:once"
     }
