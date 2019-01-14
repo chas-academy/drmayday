@@ -3,12 +3,16 @@ version: "3.1"
 
 services:
   drmayday:
-    image: ekander/drmayday:latest
+    image: chasschool/drmayday:latest
     ports:
       - 80:4000
     networks:
       - drmayday
     environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
       - SLACK_TOKEN=${SLACK_TOKEN}
 
   db:
@@ -21,10 +25,8 @@ services:
       - drmayday
     environment:
       - MYSQL_DATABASE=drmayday
-      - MYSQL_USER=drmayday
-      - MYSQL_PASSWORD=test
-      - MYSQL_ROOT_PASSWORD=test
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
 
   adminer:
     image: adminer
