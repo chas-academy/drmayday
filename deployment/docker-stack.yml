@@ -1,0 +1,51 @@
+version: "3.5"
+
+services:
+  api:
+    image: chasschool/drmayday:latest
+    networks:
+      - traefik
+      - drmayday
+    environment:
+      - DB_HOST=drmayday_db
+      - DB_NAME=drmayday
+      - DB_USER=drmayday
+      - DB_PASSWORD=dbpass
+      - SLACK_TOKEN=slacktoken
+    depends_on:
+      - db
+    deploy:
+      labels:
+        traefik.port: "4000"
+        traefik.backend: "drmayday"
+        traefik.docker.network: "traefik"
+        traefik.frontend.rule: "Host:drmayday.chas.school"
+
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - drmayday
+    deploy:
+      labels:
+        traefik.enable: "false"
+    environment:
+      - MYSQL_DATABASE=drmayday
+      - MYSQL_USER=drmayday
+      - MYSQL_PASSWORD=dbpass
+      - MYSQL_ROOT_PASSWORD=dbpass
+
+volumes:
+  db:
+
+networks:
+  traefik:
+    external: true
+  drmayday:
+    external: false
+
