@@ -3,6 +3,10 @@ open Jest;
 describe("#Slack.Commands", () =>
   Expect.(
     describe("decodeCommand", () => {
+      test("clear", () =>
+        expect(Commands.decodeCommand("clear")) |> toEqual(Commands.Clear)
+      );
+
       test("help", () =>
         expect(Commands.decodeCommand("help")) |> toEqual(Commands.Help)
       );

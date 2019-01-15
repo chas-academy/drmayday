@@ -9,6 +9,7 @@ let handleEvent = event => {
          switch (subtype) {
          | Human =>
            switch (command) {
+           | Clear => Queue.clear(isAdmin, sendMessage)
            | Help => Misc.helpMessage(sendMessage)
            | Mayday =>
              Help.mayday(text, user, isAdmin, sendMessage, sendMessageWA)

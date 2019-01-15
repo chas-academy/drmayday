@@ -111,6 +111,28 @@ let addRoom = (itemId, room, sendMessage) => {
   );
 };
 
+let markAllAsFinished = () =>
+  Js.Promise.make((~resolve, ~reject as _reject) => {
+    let conn = connect();
+
+    MySql2.execute(
+      conn,
+      "UPDATE help_items SET finished = true WHERE finished = false",
+      None,
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) => Js.log2("SELECT:", select)
+        | `Mutation(mutation) =>
+          Js.log2("MUTATION: ", mutation);
+          resolve(. mutation |> MySql2.Mutation.affectedRows);
+        };
+
+        MySql2.Connection.close(conn);
+      },
+    );
+  });
+
 let closeHelpItem = itemId =>
   Js.Promise.make((~resolve, ~reject as _reject) => {
     let conn = connect();

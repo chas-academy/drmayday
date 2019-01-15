@@ -1,3 +1,21 @@
+let clear = (isAdmin, sendMessage) => {
+  isAdmin ?
+    Js.Promise.(
+      Database.markAllAsFinished()
+      |> then_(affectedRows => {
+           let message =
+             switch (affectedRows) {
+             | 0 => "Nothing to clear!"
+             | _ => "OK. Marked all items as finished! Hope you know what you're doing! :grimacing"
+             };
+
+           sendMessage(message);
+         })
+      |> ignore
+    ) :
+    sendMessage("Nice try! :face_with_hand_over_mouth:") |> ignore;
+};
+
 let next = (isAdmin, sendMessage, sendMessageWithAttachments) => {
   isAdmin ?
     {

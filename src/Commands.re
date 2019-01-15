@@ -8,6 +8,7 @@ module Utils = {
 };
 
 type commands =
+  | Clear
   | Help
   | Mayday
   | Next
@@ -17,6 +18,7 @@ type commands =
 
 let decodeCommand = text =>
   switch (text |> Utils.parseCommand) {
+  | "clear" => Clear
   | "help" => Help
   | "m"
   | "mayday" => Mayday

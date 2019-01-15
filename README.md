@@ -57,6 +57,7 @@ You'll need to change the host-adress at the following locations in the Slack AP
 
 | Command                | Short | Privileges | Description                   |
 | ---------------------- | ----- | ---------- | ----------------------------- |
+| `clear`                |       | `Teacher`  | Mark all items as finished    |
 | `help`                 |       | `*`        | Display the help text         |
 | `mayday <Description>` | `m`   | `Student`  | Add yourself to the help list |
 | `next`                 |       | `Teacher`  | Mark help-item as finished    |
