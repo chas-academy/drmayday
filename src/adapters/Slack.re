@@ -292,13 +292,14 @@ module Message = {
       "*Sure, here's the list of the all the current commands! :tada:*\n",
       "\n*Student:*\n",
       "```",
-      "mayday|m <Description> ___________________ Call for a teacher.",
-      "queue|q __________________________________ Show the list of patients",
+      "mayday|m <Description> ________ Call for a teacher.",
+      "queue|q _______________________ Show the list of patients",
       "```",
       "\n*Teacher:*\n",
       "```",
-      "next _____________________________________ Get the next in line",
-      "queue|q __________________________________ Show the list of patients",
+      "clear _________________________ Clears the queue of all unfinished items",
+      "next __________________________ Get the next in line",
+      "queue|q _______________________ Show the list of patients",
       "```",
     ]
     |> String.concat("\n");
