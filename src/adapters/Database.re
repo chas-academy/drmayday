@@ -14,6 +14,7 @@ type helpItem = {
   timeCreated: float,
   timeClosed: option(float),
   finished: bool,
+  position: option(int),
 };
 
 module Decode = {
@@ -26,6 +27,7 @@ module Decode = {
     room: json |> optional(field("room", string)),
     timeCreated: json |> field("time_created", Json.Decode.float),
     timeClosed: json |> optional(field("time_closed", Json.Decode.float)),
+    position: json |> optional(field("position", Json.Decode.int)),
     finished:
       switch (json |> field("finished", int)) {
       | 1 => true
@@ -274,6 +276,47 @@ let hasUnfinishedHelpItem = userId =>
           | 0 => resolve(. false)
           | _ => resolve(. true)
           };
+        | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
+        };
+
+        MySql2.Connection.close(conn);
+      },
+    );
+  });
+
+let getQueuePosition = userId =>
+  Js.Promise.make((~resolve, ~reject as _reject) => {
+    Js.log2("USER_ID: ", userId);
+    let conn = connect();
+
+    let params =
+      MySql2.Params.named(
+        Json.Encode.(object_([("user_id", string(userId))])),
+      );
+
+    MySql2.execute(
+      conn,
+      "SELECT `id`,
+      (SELECT COUNT(*) FROM `help_items` WHERE `user_id` <= :user_id) AS `position`,
+      `user_id`,
+      `description`,
+      `room`,
+      `finished`,
+      `time_created`,
+      `time_closed`
+      FROM `help_items`
+      WHERE `user_id` = :user_id AND finished = false LIMIT 1;",
+      Some(params),
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) =>
+          Js.log2("Select: ", select);
+          let rows =
+            select
+            ->MySql2.Select.rows
+            ->Belt.Array.map(item => item |> Decode.helpItem);
+          resolve(. rows[0].position);
         | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
         };
 
