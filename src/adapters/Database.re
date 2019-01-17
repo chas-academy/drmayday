@@ -83,33 +83,34 @@ let addHelpItem = (userId, description, sendMessageWithAttachments) => {
   );
 };
 
-let addRoom = (itemId, room, sendMessage) => {
-  let conn = connect();
+let addRoom = (itemId, room) =>
+  Js.Promise.make((~resolve as _resolve, ~reject as _reject) => {
+    let conn = connect();
 
-  let params =
-    MySql2.Params.named(
-      Json.Encode.(
-        object_([("id", int(itemId)), ("room", string(room))])
-      ),
+    let params =
+      MySql2.Params.named(
+        Json.Encode.(
+          object_([("id", int(itemId)), ("room", string(room))])
+        ),
+      );
+
+    MySql2.execute(
+      conn,
+      "UPDATE help_items SET room = :room WHERE id = :id",
+      Some(params),
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) => Js.log2("SELECT: ", select)
+        | `Mutation(mutation) =>
+          Js.log2("MUTATION: ", mutation);
+          _resolve(. true);
+        };
+
+        MySql2.Connection.close(conn);
+      },
     );
-
-  MySql2.execute(
-    conn,
-    "UPDATE help_items SET room = :room WHERE id = :id",
-    Some(params),
-    res => {
-      switch (res) {
-      | `Error(e) => Js.log2("ERROR: ", e)
-      | `Select(select) => Js.log2("SELECT: ", select)
-      | `Mutation(mutation) =>
-        Js.log2("MUTATION: ", mutation);
-        sendMessage("Sweet, you're in the queue!") |> ignore;
-      };
-
-      MySql2.Connection.close(conn);
-    },
-  );
-};
+  });
 
 let markAllAsFinished = () =>
   Js.Promise.make((~resolve, ~reject as _reject) => {
