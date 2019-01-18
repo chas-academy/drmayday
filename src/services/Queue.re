@@ -46,7 +46,40 @@ let next = (isAdmin, sendMessage, sendMessageWithAttachments) => {
 };
 
 let getOpenItems = sendMessage =>
-  Database.getOpenItems(sendMessage) |> ignore;
+  Js.Promise.(
+    Database.getOpenItems()
+    |> then_((helpItems: array(Database.helpItem)) => {
+
+      let message = switch(Belt.Array.length(helpItems)) {
+        | 0 => "Woot. No one on the help list? Nice work!"
+        | _ => "*Here's the current list of patients:*\n\n"
+              ++ (
+                helpItems->Belt.Array.mapWithIndex(
+                  (i, {userId, description, room, timeCreated}) =>
+                  "*"
+                  ++ string_of_int(i + 1)
+                  ++ "*. "
+                  ++ Slack.Utils.encodeUserId(userId)
+                  ++ " - "
+                  ++ description
+                  ++ " - "
+                  ++ Database.Utils.formatTimestamp(timeCreated)
+                  ++ (
+                    switch (room) {
+                    | Some(r) => " in *" ++ Slack.Message.parseRoom(r) ++ "*"
+                    | None => ""
+                    }
+                  )
+                )
+                |> Js.Array.joinWith("\n")
+              )
+      }
+      
+      sendMessage(message)
+      resolve();
+      
+    }) |> ignore
+  )
 
 let markAsFinished = (itemId, sendMessage) => {
   Js.Promise.(
