@@ -284,20 +284,17 @@ let hasUnfinishedHelpItem = userId =>
     );
   });
 
-let getQueuePosition = userId =>
+let getQueuePosition = itemId =>
   Js.Promise.make((~resolve, ~reject as _reject) => {
-    Js.log2("USER_ID: ", userId);
     let conn = connect();
 
     let params =
-      MySql2.Params.named(
-        Json.Encode.(object_([("user_id", string(userId))])),
-      );
+      MySql2.Params.named(Json.Encode.(object_([("id", string(itemId))])));
 
     MySql2.execute(
       conn,
       "SELECT `id`,
-      (SELECT COUNT(*) FROM `help_items` WHERE `user_id` <= :user_id) AS `position`,
+      (SELECT COUNT(*) FROM `help_items` WHERE `id` <= :id) AS `position`,
       `user_id`,
       `description`,
       `room`,
@@ -305,7 +302,7 @@ let getQueuePosition = userId =>
       `time_created`,
       `time_closed`
       FROM `help_items`
-      WHERE `user_id` = :user_id AND finished = false LIMIT 1;",
+      WHERE `id` = :id AND finished = false LIMIT 1;",
       Some(params),
       res => {
         switch (res) {
