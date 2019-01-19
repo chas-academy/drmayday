@@ -246,8 +246,8 @@ let hasUnfinishedHelpItem = userId =>
             ->MySql2.Select.rows
             ->Belt.Array.map(item => item |> Decode.helpItem);
           switch (Array.length(rows)) {
-          | 0 => resolve(. false)
-          | _ => resolve(. true)
+          | 0 => resolve(. (false, None))
+          | _ => resolve(. (true, Some(rows[0].id)))
           };
         | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
         };
