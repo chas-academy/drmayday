@@ -1,17 +1,29 @@
 let mayday = (text, user, isAdmin, sendMessage, sendMessageWithAttachments) => {
   Js.Promise.(
-    isAdmin ?
-      sendMessage("Hey, this is restricted to students!") |> ignore :
-      user
-      |> Database.hasUnfinishedHelpItem
+    if (isAdmin) {
+      sendMessage("Hey, this is restricted to students!") |> ignore
+    } else {
+      Database.hasUnfinishedHelpItem(user)
       |> then_(hasUnfinished => {
-           hasUnfinished ?
-             sendMessage("You're already on the help list!") |> ignore :
-             Database.addHelpItem(user, text, sendMessageWithAttachments);
 
-           resolve();
-         })
-      |> ignore
+            if (hasUnfinished) {
+              sendMessage("You're already on the help list!") |> ignore
+            } else {
+
+              Database.addHelpItem(user, text) 
+              |> then_(itemId => 
+                sendMessageWithAttachments(
+                  "OK, I've added you to the queue, but please tell me which room you're in: "
+                  ++ Slack.Utils.encodeUserId(user), 
+                  Slack.Message.specifyRoom(itemId)
+                )
+              ) |> ignore
+
+            } 
+
+            resolve();
+        }) |> ignore
+    }
   );
 };
 
