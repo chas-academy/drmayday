@@ -2,6 +2,7 @@
 .merlin
 .bsb.lock
 npm-debug.log
+/coverage
 /lib/bs
 /lib/js/src
 /lib/js/__tests__/*.js
