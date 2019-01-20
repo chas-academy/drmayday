@@ -8,6 +8,7 @@
     "start": "bsb -make-world -w",
     "clean": "bsb -clean-world",
     "release": "standard-version",
+    "tag": "git push --follow-tags origin master",
     "test": "jest --watchAll",
     "test:once": "jest"
   },
