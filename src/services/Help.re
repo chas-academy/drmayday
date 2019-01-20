@@ -48,7 +48,7 @@ let updateRoom = (user, isAdmin, sendMessage, sendMessageWithAttachments) => {
               "OK, please tell me which room you're in: ", 
               Slack.Message.specifyRoom(itemId)
             )
-            : sendMessage("Hmm, you don't seem to be in the queue. Use `mayday` to add yourself.")
+            : sendMessage("Hmm, you don't seem to have an active ticket. Use `mayday` to add yourself.")
 
           resolve();
       }) |> ignore
