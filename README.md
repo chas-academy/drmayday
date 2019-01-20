@@ -62,6 +62,7 @@ You'll need to change the host-adress at the following locations in the Slack AP
 | `mayday <Description>` | `m`   | `Student`  | Add yourself to the help list |
 | `next`                 |       | `Teacher`  | Mark help-item as finished    |
 | `queue`                | `q`   | `*`        | Show the current queue        |
+| `room`                 |       | `Student`  | Change your room-location     |
 
 ## [Standard](#standards)
 
