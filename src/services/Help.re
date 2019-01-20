@@ -42,18 +42,16 @@ let updateRoom = (user, isAdmin, sendMessage, sendMessageWithAttachments) => {
     ) : (
       Database.hasUnfinishedHelpItem(user)
       |> then_(((hasUnfinished, itemId)) => {
-        
-            if (hasUnfinished) {
-              sendMessageWithAttachments(
-                "OK, please tell me which room you're in: ",
-                Slack.Message.specifyRoom(itemId)
-              )
-            } else {
-              sendMessage("Hmm, you don't seem to be in the queue. Use `mayday` to add yourself.")
-            } 
 
-            resolve();
-        }) |> ignore
+          hasUnfinished 
+            ? sendMessageWithAttachments(
+              "OK, please tell me which room you're in: ", 
+              Slack.Message.specifyRoom(itemId)
+            )
+            : sendMessage("Hmm, you don't seem to be in the queue. Use `mayday` to add yourself.")
+
+          resolve();
+      }) |> ignore
     )
   )
 }
