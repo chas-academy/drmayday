@@ -7,6 +7,7 @@
    - [Slack](#slack)
 2. [Usage](#usage)
 3. [Standard](#standards)
+4. [Misc](#misc)
 
 ## [Getting started](#getting-started)
 
@@ -67,4 +68,8 @@ You'll need to change the host-adress at the following locations in the Slack AP
 
 - [Semantic commits](https://gist.github.com/lessp/7af7ca9e3a2f3508755dcddfcbc1f15d)
 
-## ... more to come
+## [Misc](#misc)
+
+**Icon used in Slack:**
+
+Icons made by [Freepik](https://www.freepik.com) from [www.flaticon.com](https://www.flaticon.com/) is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/)
