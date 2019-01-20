@@ -16,6 +16,7 @@ let handleEvent = event => {
            | Next => Queue.next(isAdmin, sendMessage, sendMessageWA)
            | Queue => Queue.getOpenItems(sendMessage)
            | Remove => Queue.remove(user, sendMessage)
+           | Room => Help.updateRoom(user, isAdmin, sendMessage, sendMessageWA)
            | _ => Misc.unknownCommand(sendMessage)
            }
          | Bot => ()

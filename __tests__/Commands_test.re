@@ -39,6 +39,10 @@ describe("#Slack.Commands", () =>
       test("remove", () => 
         expect(Commands.decodeCommand("remove")) |> toEqual(Commands.Remove)
       );
+      
+      test("room", () =>
+        expect(Commands.decodeCommand("room")) |> toEqual(Commands.Room)
+      );
     })
   )
 );
