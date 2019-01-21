@@ -1,4 +1,8 @@
-# Dr. Mayday - WIP
+# Dr. Mayday
+
+A help bot for Chas Academy.
+
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/chas-academy/drmayday.svg?columns=all)](https://waffle.io/chas-academy/drmayday)
 
 ## Table of Contents
 
