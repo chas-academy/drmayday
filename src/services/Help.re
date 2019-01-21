@@ -4,7 +4,8 @@ let mayday = (text, user, isAdmin, sendMessage, sendMessageWithAttachments) => {
       sendMessage("Hey, this is restricted to students!") |> ignore
     } else {
       Database.hasUnfinishedHelpItem(user)
-      |> then_(hasUnfinished => {
+      |> then_(res => {
+            let (hasUnfinished, _itemId) = res;
 
             if (hasUnfinished) {
               sendMessage("You're already on the help list!") |> ignore

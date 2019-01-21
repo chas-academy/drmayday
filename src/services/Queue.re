@@ -122,3 +122,32 @@ let markAsFinished = (itemId, sendMessage) => {
     }
   );
 };
+
+let remove = (user, isAdmin, sendMessage) => {
+  isAdmin ? sendMessage("Hey, this is restricted to students!") |> ignore : (
+    Js.Promise.(
+      user 
+      |> Database.hasUnfinishedHelpItem
+      |> then_(res => {
+        let (hasUnfinished, itemId) = res;
+
+        !hasUnfinished 
+          ? sendMessage("You don't have an active help-ticket. Nothing to clear!") |> ignore 
+          : (
+            switch (itemId) {
+            | None => ()
+            | Some(id) => {
+              id
+              |> Database.closeHelpItem
+              |> then_(_closed => {
+                sendMessage("OK, I've closed your ticket!")
+              }) |> ignore
+            }
+          }
+        )
+
+        resolve()
+      }) |> ignore
+    )
+  )
+}
