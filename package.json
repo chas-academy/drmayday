@@ -7,6 +7,8 @@
     "server": "node lib/js/src/Server.bs.js",
     "start": "bsb -make-world -w",
     "clean": "bsb -clean-world",
+    "release": "standard-version",
+    "tag": "git push --follow-tags origin master",
     "test": "jest --watchAll",
     "test:once": "jest"
   },
@@ -22,7 +24,8 @@
     "@glennsl/bs-jest": "^0.4.5",
     "bs-axios": "0.0.39",
     "bs-platform": "^4.0.6",
-    "husky": "^1.3.1"
+    "husky": "^1.3.1",
+    "standard-version": "^4.4.0"
   },
   "dependencies": {
     "@glennsl/bs-json": "^3.0.0",

@@ -6,7 +6,10 @@
    - [DB](#db)
    - [Slack](#slack)
 2. [Usage](#usage)
-3. [Standard](#standards)
+3. [Standards](#standards)
+4. [Misc](#misc)
+   - [Changelog and tagging](#changelog-and-tagging)
+   - [Credits](#credits)
 
 ## [Getting started](#getting-started)
 
@@ -62,10 +65,30 @@ You'll need to change the host-adress at the following locations in the Slack AP
 | `mayday <Description>` | `m`   | `Student`  | Add yourself to the help list |
 | `next`                 |       | `Teacher`  | Mark help-item as finished    |
 | `queue`                | `q`   | `*`        | Show the current queue        |
+| `remove`               |       | `Student`  | Remove one-self from queue    |
 | `room`                 |       | `Student`  | Change your room-location     |
 
 ## [Standard](#standards)
 
-- [Semantic commits](https://gist.github.com/lessp/7af7ca9e3a2f3508755dcddfcbc1f15d)
+- [Semantic commits](https://gist.github.com/lessp/7af7ca9e3a2f3508755dcddfcbc1f15d) 
+- [Standard Version](https://github.com/conventional-changelog/standard-version)
 
-## ... more to come
+## [Misc](#misc)
+
+### [Changelog and tagging](#changelog-and-tagging)
+
+To update the changelog and tag a new release we use [Standard Version](https://github.com/conventional-changelog/standard-version).
+
+**Follow these steps:**
+
+```
+git checkout master; git pull origin master
+npm run release
+npm run tag // just a script to run "git push --follow-tags origin master"
+```
+
+### [Credits](#credits)
+
+**Icon used in Slack:**
+
+Icons made by [Freepik](https://www.freepik.com) from [www.flaticon.com](https://www.flaticon.com/) is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/)

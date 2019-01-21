@@ -294,6 +294,7 @@ module Message = {
       "```",
       "mayday|m <Description> ________ Call for a teacher.",
       "queue|q _______________________ Show the list of patients",
+      "remove ________________________ Remove yourself from the queue",
       "room __________________________ Change your current room",
       "```",
       "\n*Teacher:*\n",

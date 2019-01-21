@@ -15,7 +15,7 @@ let handleEvent = event => {
              Help.mayday(text, user, isAdmin, sendMessage, sendMessageWA)
            | Next => Queue.next(isAdmin, sendMessage, sendMessageWA)
            | Queue => Queue.getOpenItems(sendMessage)
-           | Remove => Queue.remove(user, sendMessage)
+           | Remove => Queue.remove(user, isAdmin, sendMessage)
            | Room => Help.updateRoom(user, isAdmin, sendMessage, sendMessageWA)
            | _ => Misc.unknownCommand(sendMessage)
            }
