@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/chas-academy/drmayday/compare/v0.1.0...v0.2.0) (2019-01-21)
+
+
+### Bug Fixes
+
+* add support for unicode characters room-list (queue) ([bf30c44](https://github.com/chas-academy/drmayday/commit/bf30c44))
+
+
+### Features
+
+* add ability to remove one-self from the queue ([#16](https://github.com/chas-academy/drmayday/issues/16)) ([b8d34f0](https://github.com/chas-academy/drmayday/commit/b8d34f0))
+* add the ability to change room ([#17](https://github.com/chas-academy/drmayday/issues/17)) ([c74fa4b](https://github.com/chas-academy/drmayday/commit/c74fa4b))
+
+
+
 <a name="0.1.0"></a>
 # 0.1.0 (2019-01-20)
 
