@@ -66,6 +66,7 @@ You'll need to change the host-adress at the following locations in the Slack AP
 | `next`                 |       | `Teacher`  | Mark help-item as finished    |
 | `queue`                | `q`   | `*`        | Show the current queue        |
 | `remove`               |       | `Student`  | Remove one-self from queue    |
+| `room`                 |       | `Student`  | Change your room-location     |
 
 ## [Standard](#standards)
 

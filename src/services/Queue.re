@@ -128,8 +128,7 @@ let remove = (user, isAdmin, sendMessage) => {
     Js.Promise.(
       user 
       |> Database.hasUnfinishedHelpItem
-      |> then_(res => {
-        let (hasUnfinished, itemId) = res;
+      |> then_(((hasUnfinished, itemId)) => {
 
         !hasUnfinished 
           ? sendMessage("You don't have an active help-ticket. Nothing to clear!") |> ignore 

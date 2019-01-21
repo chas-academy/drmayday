@@ -4,8 +4,7 @@ let mayday = (text, user, isAdmin, sendMessage, sendMessageWithAttachments) => {
       sendMessage("Hey, this is restricted to students!") |> ignore
     } else {
       Database.hasUnfinishedHelpItem(user)
-      |> then_(res => {
-            let (hasUnfinished, _itemId) = res;
+      |> then_(((hasUnfinished, _itemId)) => {
 
             if (hasUnfinished) {
               sendMessage("You're already on the help list!") |> ignore
@@ -35,3 +34,24 @@ let selectRoom = (selectOption, itemId, sendMessage) => {
   | None => ()
   };
 };
+
+let updateRoom = (user, isAdmin, sendMessage, sendMessageWithAttachments) => {
+  Js.Promise.(
+    isAdmin ? (
+      sendMessage("Hey, this is restricted to students!") |> ignore
+    ) : (
+      Database.hasUnfinishedHelpItem(user)
+      |> then_(((hasUnfinished, itemId)) => {
+
+          hasUnfinished 
+            ? sendMessageWithAttachments(
+              "OK, please tell me which room you're in: ", 
+              Slack.Message.specifyRoom(itemId)
+            )
+            : sendMessage("Hmm, you don't seem to have an active ticket. Use `mayday` to add yourself.")
+
+          resolve();
+      }) |> ignore
+    )
+  )
+}
