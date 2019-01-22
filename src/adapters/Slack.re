@@ -27,6 +27,16 @@ module IO = {
       |> then_(result => result##data##user##is_admin |> resolve)
     );
   };
+
+  let makeAuthCallback = code =>
+    Axios.get(
+      "https://slack.com/api/oauth.access?client_id="
+      ++ Config.slackClientId
+      ++ "&client_secret="
+      ++ Config.slackClientSecret
+      ++ "&code="
+      ++ code,
+    );
 };
 
 module SubType = {

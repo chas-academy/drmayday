@@ -32,6 +32,7 @@
     "body-parser": "^1.18.3",
     "bs-express": "^0.9.0",
     "bs-mysql2": "^8.2.1",
+    "cookie-session": "^2.0.0-beta.3",
     "date-fns": "^1.29.0",
     "dotenv": "^6.1.0"
   },

@@ -36,7 +36,7 @@ let actions =
         body |> Slack.Action.decodeActionBody |> Action.handleAction;
         Response.sendStatus(Ok);
       | UnknownAction => Response.sendStatus(BadRequest)
-      };
+      }
     | None => Response.sendStatus(BadRequest)
     }
   );
