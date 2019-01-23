@@ -14,6 +14,10 @@ type helpItem = {
   timeCreated: float,
   timeClosed: option(float),
   finished: bool,
+};
+
+type position = {
+  id: int,
   position: option(int),
 };
 
@@ -27,12 +31,16 @@ module Decode = {
     room: json |> optional(field("room", string)),
     timeCreated: json |> field("time_created", Json.Decode.float),
     timeClosed: json |> optional(field("time_closed", Json.Decode.float)),
-    position: json |> optional(field("position", Json.Decode.int)),
     finished:
       switch (json |> field("finished", int)) {
       | 1 => true
       | _ => false
       },
+  };
+
+  let position = json => {
+    id: json |> field("id", int),
+    position: json |> optional(field("position", int)),
   };
 };
 
@@ -220,23 +228,24 @@ let getOpenItems = sendMessage => {
           | _ =>
             "*Here's the current list of patients:*\n\n"
             ++ (
-              rows->Belt.Array.mapWithIndex(
-                (i, {userId, description, room, timeCreated}) =>
-                "*"
-                ++ string_of_int(i + 1)
-                ++ "*. "
-                ++ Slack.Utils.encodeUserId(userId)
-                ++ " - "
-                ++ description
-                ++ " - "
-                ++ Utils.formatTimestamp(timeCreated)
-                ++ (
-                  switch (room) {
-                  | Some(r) => " in *" ++ Slack.Message.parseRoom(r) ++ "*"
-                  | None => ""
-                  }
+              rows
+              ->Belt.Array.mapWithIndex(
+                  (i, {userId, description, room, timeCreated}) =>
+                  "*"
+                  ++ string_of_int(i + 1)
+                  ++ "*. "
+                  ++ Slack.Utils.encodeUserId(userId)
+                  ++ " - "
+                  ++ description
+                  ++ " - "
+                  ++ Utils.formatTimestamp(timeCreated)
+                  ++ (
+                    switch (room) {
+                    | Some(r) => " in *" ++ Slack.Message.parseRoom(r) ++ "*"
+                    | None => ""
+                    }
+                  )
                 )
-              )
               |> Js.Array.joinWith("\n")
             )
           }
@@ -294,13 +303,7 @@ let getQueuePosition = itemId =>
     MySql2.execute(
       conn,
       "SELECT `id`,
-      (SELECT COUNT(*) FROM `help_items` WHERE `id` <= :id) AS `position`,
-      `user_id`,
-      `description`,
-      `room`,
-      `finished`,
-      `time_created`,
-      `time_closed`
+      (SELECT COUNT(*) FROM `help_items` WHERE `id` <= :id) AS `position`
       FROM `help_items`
       WHERE `id` = :id AND finished = false LIMIT 1;",
       Some(params),
@@ -312,7 +315,7 @@ let getQueuePosition = itemId =>
           let rows =
             select
             ->MySql2.Select.rows
-            ->Belt.Array.map(item => item |> Decode.helpItem);
+            ->Belt.Array.map(item => item |> Decode.position);
           resolve(. rows[0].position);
         | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
         };

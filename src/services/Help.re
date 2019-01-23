@@ -33,7 +33,7 @@ let selectRoom = (selectedOption, itemId, sendMessage) =>
 
                 sendMessage(msg) |> ignore;
 
-                resolve();
+                resolve(queuePosition);
               })
            |> ignore :
            sendMessage("Something went wrong. Try again later!") |> ignore;

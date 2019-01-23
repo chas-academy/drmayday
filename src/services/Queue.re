@@ -1,4 +1,4 @@
-let clear = (isAdmin, sendMessage) => {
+let clear = (isAdmin, sendMessage) =>
   isAdmin ?
     Js.Promise.(
       Database.markAllAsFinished()
@@ -14,41 +14,37 @@ let clear = (isAdmin, sendMessage) => {
       |> ignore
     ) :
     sendMessage("Nice try! :face_with_hand_over_mouth:") |> ignore;
-};
 
-let next = (isAdmin, sendMessage, sendMessageWithAttachments) => {
+let next = (isAdmin, sendMessage, sendMessageWithAttachments) =>
   isAdmin ?
-    {
-      Js.Promise.(
-        Database.getFirstHelpItem()
-        |> then_(item => {
-             switch (item) {
-             | Some((helpItem: Database.helpItem)) =>
-               sendMessageWithAttachments(
-                 "Really remove "
-                 ++ Slack.Utils.encodeUserId(helpItem.userId)
-                 ++ " from the queue? Have they received help?",
-                 Slack.Message.confirmQueueRemoval(helpItem.id),
-               )
-               |> ignore
-             | None =>
-               "There's no one next in line! Nice work! :tada:"
-               |> sendMessage
-               |> ignore
-             };
-             resolve();
-           })
-        |> ignore
-      );
-    } :
+    Js.Promise.(
+      Database.getFirstHelpItem()
+      |> then_(item => {
+           switch (item) {
+           | Some((helpItem: Database.helpItem)) =>
+             sendMessageWithAttachments(
+               "Really remove "
+               ++ Slack.Utils.encodeUserId(helpItem.userId)
+               ++ " from the queue? Have they received help?",
+               Slack.Message.confirmQueueRemoval(helpItem.id),
+             )
+             |> ignore
+           | None =>
+             "There's no one next in line! Nice work! :tada:"
+             |> sendMessage
+             |> ignore
+           };
+           resolve();
+         })
+      |> ignore
+    ) :
     sendMessage("Hey, this is restricted to teachers! :face_with_monocle:")
     |> ignore;
-};
 
 let getOpenItems = sendMessage =>
   Database.getOpenItems(sendMessage) |> ignore;
 
-let markAsFinished = (itemId, sendMessage) => {
+let markAsFinished = (itemId, sendMessage) =>
   Js.Promise.(
     switch (itemId) {
     | Some(id) =>
@@ -88,4 +84,3 @@ let markAsFinished = (itemId, sendMessage) => {
     | None => ()
     }
   );
-};
