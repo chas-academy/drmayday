@@ -25,7 +25,7 @@ let selectRoom = (selectedOption, itemId, sendMessage) =>
                 let msg =
                   switch (queuePosition) {
                   | Some(queueNum) =>
-                    "Ok, have a seat and relax. You’re number "
+                    "Ok, have a seat and relax. You're number "
                     ++ string_of_int(queueNum)
                     ++ " in line. :coffee:"
                   | None => "Oops. Couldn't get your position in queue."
