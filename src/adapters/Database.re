@@ -94,7 +94,7 @@ let addHelpItem = (userId, description, sendMessageWithAttachments) => {
 };
 
 let addRoom = (itemId, room) =>
-  Js.Promise.make((~resolve as _resolve, ~reject as _reject) => {
+  Js.Promise.make((~resolve, ~reject as _reject) => {
     let conn = connect();
 
     let params =
@@ -114,7 +114,7 @@ let addRoom = (itemId, room) =>
         | `Select(select) => Js.log2("SELECT: ", select)
         | `Mutation(mutation) =>
           Js.log2("MUTATION: ", mutation);
-          _resolve(. true);
+          resolve(. true);
         };
 
         MySql2.Connection.close(conn);

@@ -36,7 +36,10 @@ let selectRoom = (selectedOption, itemId, sendMessage) =>
                 resolve(queuePosition);
               })
            |> ignore :
-           sendMessage("Something went wrong. Try again later!") |> ignore;
+           sendMessage(
+             "I ran into some trouble adding your location. Try again later!",
+           )
+           |> ignore;
          resolve();
        })
     |> ignore
