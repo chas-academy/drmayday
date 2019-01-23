@@ -20,6 +20,7 @@
   "suffix": ".bs.js",
   "bs-dependencies": [
     "bs-axios",
+    "bs-cookie-session",
     "bs-express",
     "bs-mysql2",
     "@ahrefs/bs-dotenv",
