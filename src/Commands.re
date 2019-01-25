@@ -14,6 +14,8 @@ type commands =
   | Next
   | NextForce
   | Queue
+  | Remove
+  | Room
   | Unknown;
 
 let decodeCommand = text =>
@@ -26,5 +28,7 @@ let decodeCommand = text =>
   | "next!" => NextForce
   | "q"
   | "queue" => Queue
+  | "remove" => Remove
+  | "room" => Room
   | _ => Unknown
   };

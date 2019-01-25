@@ -1,18 +1,28 @@
 open Js.Promise;
 
-let mayday = (text, user, isAdmin, sendMessage, sendMessageWithAttachments) =>
+let mayday = (text, user, isAdmin, sendMessage, sendMessageWithAttachments) => {
   isAdmin ?
     sendMessage("Hey, this is restricted to students!") |> ignore :
-    user
-    |> Database.hasUnfinishedHelpItem
-    |> then_(hasUnfinished => {
-         hasUnfinished ?
-           sendMessage("You're already on the help list!") |> ignore :
-           Database.addHelpItem(user, text, sendMessageWithAttachments);
+    Database.hasUnfinishedHelpItem(user)
+    |> then_(((hasUnfinished, _itemId)) => {
+         if (hasUnfinished) {
+           sendMessage("You're already on the help list!") |> ignore;
+         } else {
+           Database.addHelpItem(user, text)
+           |> then_(itemId =>
+                sendMessageWithAttachments(
+                  "OK, I've added you to the queue, but please tell me which room you're in: "
+                  ++ Slack.Utils.encodeUserId(user),
+                  Slack.Message.specifyRoom(itemId),
+                )
+              )
+           |> ignore;
+         };
 
          resolve();
        })
     |> ignore;
+};
 
 let selectRoom = (selectedOption, itemId, sendMessage) =>
   switch (selectedOption) {
@@ -22,7 +32,7 @@ let selectRoom = (selectedOption, itemId, sendMessage) =>
          roomWasAdded ?
            Database.getQueuePosition(itemId)
            |> then_(queuePosition => {
-                let msg =
+                let message =
                   switch (queuePosition) {
                   | Some(queueNum) =>
                     "Ok, have a seat and relax. You're number "
@@ -31,7 +41,7 @@ let selectRoom = (selectedOption, itemId, sendMessage) =>
                   | None => "Oops. Couldn't get your position in queue."
                   };
 
-                sendMessage(msg) |> ignore;
+                sendMessage(message);
 
                 resolve(queuePosition);
               })
@@ -45,3 +55,22 @@ let selectRoom = (selectedOption, itemId, sendMessage) =>
     |> ignore
   | None => ()
   };
+
+let updateRoom = (user, isAdmin, sendMessage, sendMessageWithAttachments) => {
+  isAdmin ?
+    sendMessage("Hey, this is restricted to students!") |> ignore :
+    Database.hasUnfinishedHelpItem(user)
+    |> then_(((hasUnfinished, itemId)) => {
+         hasUnfinished ?
+           sendMessageWithAttachments(
+             "OK, please tell me which room you're in: ",
+             Slack.Message.specifyRoom(itemId),
+           ) :
+           sendMessage(
+             "Hmm, you don't seem to have an active ticket. Use `mayday` to add yourself.",
+           );
+
+         resolve();
+       })
+    |> ignore;
+};

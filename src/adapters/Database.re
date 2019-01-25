@@ -54,44 +54,43 @@ let connect = () =>
     (),
   );
 
-let addHelpItem = (userId, description, sendMessageWithAttachments) => {
-  let conn = connect();
-  let timestamp = Js.Date.now();
+let addHelpItem = (userId, description) =>
+  Js.Promise.make((~resolve, ~reject as _reject) => {
+    let conn = connect();
+    let timestamp = Js.Date.now();
 
-  let params =
-    MySql2.Params.named(
-      Json.Encode.(
-        object_([
-          ("user_id", string(userId)),
-          ("description", string(description)),
-          ("time_created", Json.Encode.float(timestamp)),
-          ("finished", bool(false)),
-        ])
-      ),
+    let params =
+      MySql2.Params.named(
+        Json.Encode.(
+          object_([
+            ("user_id", string(userId)),
+            ("description", string(description)),
+            ("time_created", Json.Encode.float(timestamp)),
+            ("finished", bool(false)),
+          ])
+        ),
+      );
+
+    MySql2.execute(
+      conn,
+      "INSERT INTO help_items (user_id, description, time_created, finished) VALUES (:user_id, :description, :time_created, :finished)",
+      Some(params),
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) => Js.log2("SELECT: ", select)
+        | `Mutation(mutation) =>
+          Js.log2("MUTATION: ", mutation);
+          switch (mutation |> MySql2.Mutation.insertId) {
+          | None => ()
+          | Some(id) => resolve(. id |> MySql2_id.toString)
+          };
+        };
+
+        MySql2.Connection.close(conn);
+      },
     );
-
-  MySql2.execute(
-    conn,
-    "INSERT INTO help_items (user_id, description, time_created, finished) VALUES (:user_id, :description, :time_created, :finished)",
-    Some(params),
-    res => {
-      switch (res) {
-      | `Error(e) => Js.log2("ERROR: ", e)
-      | `Select(select) => Js.log2("SELECT: ", select)
-      | `Mutation(mutation) =>
-        Js.log2("MUTATION: ", mutation);
-        sendMessageWithAttachments(
-          "OK, I've added you to the queue, but please tell me which room you're in: "
-          ++ Slack.Utils.encodeUserId(userId),
-          Slack.Message.specifyRoom(mutation |> MySql2.Mutation.insertId),
-        )
-        |> ignore;
-      };
-
-      MySql2.Connection.close(conn);
-    },
-  );
-};
+  });
 
 let addRoom = (itemId, room) =>
   Js.Promise.make((~resolve, ~reject as _reject) => {
@@ -207,58 +206,31 @@ let getFirstHelpItem = () =>
     );
   });
 
-let getOpenItems = sendMessage => {
-  let conn = connect();
+let getOpenItems = () =>
+  Js.Promise.make((~resolve, ~reject as _reject) => {
+    let conn = connect();
 
-  MySql2.execute(
-    conn,
-    "SELECT * from help_items WHERE finished = false ORDER BY time_created ASC",
-    None,
-    res => {
-      switch (res) {
-      | `Error(e) => Js.log2("ERROR: ", e)
-      | `Select(select) =>
-        let rows =
-          select
-          ->MySql2.Select.rows
-          ->Belt.Array.map(item => item |> Decode.helpItem);
-        (
-          switch (Belt.Array.length(rows)) {
-          | 0 => "Woot. No one on the help list? Nice work!"
-          | _ =>
-            "*Here's the current list of patients:*\n\n"
-            ++ (
-              rows
-              ->Belt.Array.mapWithIndex(
-                  (i, {userId, description, room, timeCreated}) =>
-                  "*"
-                  ++ string_of_int(i + 1)
-                  ++ "*. "
-                  ++ Slack.Utils.encodeUserId(userId)
-                  ++ " - "
-                  ++ description
-                  ++ " - "
-                  ++ Utils.formatTimestamp(timeCreated)
-                  ++ (
-                    switch (room) {
-                    | Some(r) => " in *" ++ Slack.Message.parseRoom(r) ++ "*"
-                    | None => ""
-                    }
-                  )
-                )
-              |> Js.Array.joinWith("\n")
-            )
-          }
-        )
-        |> sendMessage;
-        ();
-      | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
-      };
+    MySql2.execute(
+      conn,
+      "SELECT * from help_items WHERE finished = false ORDER BY time_created ASC",
+      None,
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) =>
+          let rows =
+            select
+            ->MySql2.Select.rows
+            ->Belt.Array.map(item => item |> Decode.helpItem);
 
-      MySql2.Connection.close(conn);
-    },
-  );
-};
+          resolve(. rows);
+        | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
+        };
+
+        MySql2.Connection.close(conn);
+      },
+    );
+  });
 
 let hasUnfinishedHelpItem = userId =>
   Js.Promise.make((~resolve, ~reject as _) => {
@@ -282,8 +254,8 @@ let hasUnfinishedHelpItem = userId =>
             ->MySql2.Select.rows
             ->Belt.Array.map(item => item |> Decode.helpItem);
           switch (Array.length(rows)) {
-          | 0 => resolve(. false)
-          | _ => resolve(. true)
+          | 0 => resolve(. (false, None))
+          | _ => resolve(. (true, Some(rows[0].id)))
           };
         | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
         };

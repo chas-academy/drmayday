@@ -277,14 +277,14 @@ module Message = {
 
   let parseRoom = room =>
     switch (room) {
-    | "lounge" => "Föreläsningssalen"
-    | "group_room_1" => "Första grupprummet"
-    | "group_room_2" => "Andra grupprummet"
-    | "group_room_3" => "Tredje grupprummet"
-    | "group_room_4" => "Fjärde grupprummet"
-    | "manowar_room" => "Manowar-rummet"
-    | "kitchen" => "Köket"
-    | _ => "Något utav alla rum..."
+    | "lounge" => {js|"Föreläsningssalen"|js}
+    | "group_room_1" => {js|"Första grupprummet"|js}
+    | "group_room_2" => {js|"Andra grupprummet"|js}
+    | "group_room_3" => {js|"Tredje grupprummet"|js}
+    | "group_room_4" => {js|"Fjärde grupprummet"|js}
+    | "manowar_room" => {js|"Manowar-rummet"|js}
+    | "kitchen" => {js|"Köket"|js}
+    | _ => {js|"Något utav alla rum..."|js}
     };
 
   let helpMessage =
@@ -294,6 +294,8 @@ module Message = {
       "```",
       "mayday|m <Description> ________ Call for a teacher.",
       "queue|q _______________________ Show the list of patients",
+      "remove ________________________ Remove yourself from the queue",
+      "room __________________________ Change your current room",
       "```",
       "\n*Teacher:*\n",
       "```",
