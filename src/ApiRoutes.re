@@ -2,17 +2,9 @@ open Express;
 
 let requireLogin = (next, req, res) => {
   let isLoggedIn =
-    switch (Js.Dict.get(Request.asJsonObject(req), "session")) {
+    switch (Request.asJsonObject(req) |> CookieSession.getString("user")) {
+    | Some(_u) => true
     | None => false
-    | Some(s) =>
-      switch (Js.Json.decodeObject(s)) {
-      | Some(json) =>
-        switch (Js.Dict.get(json, "user")) {
-        | Some(_user) => true
-        | _ => false
-        }
-      | _ => false
-      }
     };
 
   isLoggedIn ?
@@ -44,16 +36,13 @@ let slackAuth =
 
 let me =
   Middleware.from((_next, req) => {
-    Js.log2("Logged in:", Request.session(req));
     let reqJson = Request.asJsonObject(req);
 
     let user =
-      Json.Decode.(
-        switch (Js.Dict.get(reqJson, "session")) {
-        | Some(s) => s |> field("user", string)
-        | None => ""
-        }
-      );
+      switch (reqJson |> CookieSession.getString("user")) {
+      | Some(u) => u
+      | None => ""
+      };
 
     Response.sendJson(
       Json.Encode.object_([("user", Js.Json.string(user))]),
