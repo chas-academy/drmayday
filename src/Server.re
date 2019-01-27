@@ -1,13 +1,20 @@
 open Express;
+open NirenoReasonablyTyped;
 
 let app = express();
 
 App.use(
   app,
-  CookieSession.make(
-    ~name="drmayday",
-    ~keys=["key1", "key2"],
-    ~secret="somesecret",
+  ExpressSession.(
+    session(
+      options(
+        ~secret="secret",
+        ~resave=false,
+        ~saveUninitialized=false,
+        ~cookie=cookieOptions(~secure=false, ~maxAge=3000, ()),
+        (),
+      ),
+    )
   ),
 );
 App.use(app, Middleware.json());

@@ -2,7 +2,7 @@
 // BuckleScript comes with its own parser for bsconfig.json, which is normal JSON, with the extra support of comments and trailing commas.
 {
   "name": "drmayday",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "sources": [
     {
       "dir": "src",
@@ -20,11 +20,11 @@
   "suffix": ".bs.js",
   "bs-dependencies": [
     "bs-axios",
-    "bs-cookie-session",
     "bs-express",
     "bs-mysql2",
     "@ahrefs/bs-dotenv",
-    "@glennsl/bs-json"
+    "@glennsl/bs-json",
+    "@nireno/reasonably-typed"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "warnings": {
