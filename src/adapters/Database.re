@@ -16,6 +16,11 @@ type helpItem = {
   finished: bool,
 };
 
+type position = {
+  id: int,
+  position: option(int),
+};
+
 module Decode = {
   open Json.Decode;
 
@@ -32,6 +37,11 @@ module Decode = {
       | _ => false
       },
   };
+
+  let position = json => {
+    id: json |> field("id", int),
+    position: json |> optional(field("position", int)),
+  };
 };
 
 let connect = () =>
@@ -44,7 +54,7 @@ let connect = () =>
     (),
   );
 
-let addHelpItem = (userId, description) => 
+let addHelpItem = (userId, description) =>
   Js.Promise.make((~resolve, ~reject as _reject) => {
     let conn = connect();
     let timestamp = Js.Date.now();
@@ -69,47 +79,47 @@ let addHelpItem = (userId, description) =>
         switch (res) {
         | `Error(e) => Js.log2("ERROR: ", e)
         | `Select(select) => Js.log2("SELECT: ", select)
-        | `Mutation(mutation) => {
+        | `Mutation(mutation) =>
           Js.log2("MUTATION: ", mutation);
           switch (mutation |> MySql2.Mutation.insertId) {
-            | None => ()
-            | Some(id) => resolve(. id |> MySql2_id.toString)
-          }
-        }
+          | None => ()
+          | Some(id) => resolve(. id |> MySql2_id.toString)
+          };
         };
 
         MySql2.Connection.close(conn);
       },
-    )
+    );
   });
 
-let addRoom = (itemId, room, sendMessage) => {
-  let conn = connect();
+let addRoom = (itemId, room) =>
+  Js.Promise.make((~resolve, ~reject as _reject) => {
+    let conn = connect();
 
-  let params =
-    MySql2.Params.named(
-      Json.Encode.(
-        object_([("id", int(itemId)), ("room", string(room))])
-      ),
+    let params =
+      MySql2.Params.named(
+        Json.Encode.(
+          object_([("id", int(itemId)), ("room", string(room))])
+        ),
+      );
+
+    MySql2.execute(
+      conn,
+      "UPDATE help_items SET room = :room WHERE id = :id",
+      Some(params),
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) => Js.log2("SELECT: ", select)
+        | `Mutation(mutation) =>
+          Js.log2("MUTATION: ", mutation);
+          resolve(. true);
+        };
+
+        MySql2.Connection.close(conn);
+      },
     );
-
-  MySql2.execute(
-    conn,
-    "UPDATE help_items SET room = :room WHERE id = :id",
-    Some(params),
-    res => {
-      switch (res) {
-      | `Error(e) => Js.log2("ERROR: ", e)
-      | `Select(select) => Js.log2("SELECT: ", select)
-      | `Mutation(mutation) =>
-        Js.log2("MUTATION: ", mutation);
-        sendMessage("Sweet, you're in the queue!") |> ignore;
-      };
-
-      MySql2.Connection.close(conn);
-    },
-  );
-};
+  });
 
 let markAllAsFinished = () =>
   Js.Promise.make((~resolve, ~reject as _reject) => {
@@ -196,9 +206,8 @@ let getFirstHelpItem = () =>
     );
   });
 
-let getOpenItems = () => 
+let getOpenItems = () =>
   Js.Promise.make((~resolve, ~reject as _reject) => {
-
     let conn = connect();
 
     MySql2.execute(
@@ -211,18 +220,17 @@ let getOpenItems = () =>
         | `Select(select) =>
           let rows =
             select
-            -> MySql2.Select.rows
-            -> Belt.Array.map(item => item |> Decode.helpItem);
+            ->MySql2.Select.rows
+            ->Belt.Array.map(item => item |> Decode.helpItem);
 
-          resolve(. rows)
+          resolve(. rows);
         | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
         };
 
         MySql2.Connection.close(conn);
       },
-    )
-    
-  })
+    );
+  });
 
 let hasUnfinishedHelpItem = userId =>
   Js.Promise.make((~resolve, ~reject as _) => {
@@ -249,6 +257,38 @@ let hasUnfinishedHelpItem = userId =>
           | 0 => resolve(. (false, None))
           | _ => resolve(. (true, Some(rows[0].id)))
           };
+        | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
+        };
+
+        MySql2.Connection.close(conn);
+      },
+    );
+  });
+
+let getQueuePosition = itemId =>
+  Js.Promise.make((~resolve, ~reject as _reject) => {
+    let conn = connect();
+
+    let params =
+      MySql2.Params.named(Json.Encode.(object_([("id", string(itemId))])));
+
+    MySql2.execute(
+      conn,
+      "SELECT `id`,
+      (SELECT COUNT(*) FROM `help_items` WHERE `id` <= :id) AS `position`
+      FROM `help_items`
+      WHERE `id` = :id AND finished = false LIMIT 1;",
+      Some(params),
+      res => {
+        switch (res) {
+        | `Error(e) => Js.log2("ERROR: ", e)
+        | `Select(select) =>
+          Js.log2("Select: ", select);
+          let rows =
+            select
+            ->MySql2.Select.rows
+            ->Belt.Array.map(item => item |> Decode.position);
+          resolve(. rows[0].position);
         | `Mutation(mutation) => Js.log2("MUTATION: ", mutation)
         };
 
