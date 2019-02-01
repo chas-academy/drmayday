@@ -275,7 +275,7 @@ let getQueuePosition = itemId =>
     MySql2.execute(
       conn,
       "SELECT `id`,
-      (SELECT COUNT(*) FROM `help_items` WHERE `id` <= :id) AS `position`
+      (SELECT COUNT(*) FROM `help_items` WHERE `id` <= :id AND finished = false) AS `position`
       FROM `help_items`
       WHERE `id` = :id AND finished = false LIMIT 1;",
       Some(params),
