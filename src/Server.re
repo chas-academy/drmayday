@@ -11,7 +11,7 @@ App.use(
         ~secret="secret",
         ~resave=false,
         ~saveUninitialized=false,
-        ~cookie=cookieOptions(~secure=false, ~maxAge=3000, ()),
+        ~cookie=cookieOptions(~secure=false, ~maxAge=43200 * 3600, ()),
         (),
       ),
     )
@@ -20,27 +20,23 @@ App.use(
 App.use(app, Middleware.json());
 App.use(app, Middleware.urlencoded(~extended=false, ()));
 
-App.useOnPath(app, ~path="/api") @@ Middleware.from(ApiRoutes.requireLogin);
+App.useOnPath(app, ~path="/api") @@
+PromiseMiddleware.from(ApiRoutes.requireLogin);
 
-/* Serve React-app? */
-App.get(app, ~path="/") @@
-Middleware.from((_next, _req) =>
-  Response.sendString(
-    {js|
-  <a
-    href="https://slack.com/oauth/authorize?scope=identity.basic,identity.email,identity.team,identity.avatar&client_id=166988133201.472402506917"
-  >
-    <img
-      alt="Sign in with Slack"
-      height="40"
-      width="172"
-      src="https://platform.slack-edge.com/img/sign_in_with_slack.png"
-      srcset="https://platform.slack-edge.com/img/sign_in_with_slack.png 1x,
-      https://platform.slack-edge.com/img/sign_in_with_slack@2x.png 2x"
-      />
-  </a>
-|js},
-  )
+let static_path =
+  BsNode.(
+    Node.Global.(
+      Node.Path.join([|__dirname, "../../../", "web", "build", "index.html"|])
+    )
+  );
+
+App.useOnPath(
+  app,
+  ~path="/",
+  {
+    let options = Static.defaultOptions();
+    Static.make("/", options) |> Static.asMiddleware;
+  },
 );
 
 /* API & Auth */
@@ -57,6 +53,26 @@ App.post(app, ~path="/actions") @@ Routes.actions;
 
 /* Receives the /mayday command */
 App.post(app, ~path="/mayday") @@ Routes.mayday;
+
+/* Serve React-app? */
+App.get(app, ~path="*") @@
+Middleware.from((_next, _req, res) =>
+  BsNode.(
+    Response.sendFile(
+      Node.Global.(
+        Node.Path.resolve([|
+          __dirname,
+          "../../../",
+          "web",
+          "build",
+          "index.html",
+        |])
+      ),
+      "",
+      res,
+    )
+  )
+);
 
 let port = 4000;
 let onListen = e =>

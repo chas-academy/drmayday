@@ -28,6 +28,20 @@ module IO = {
     );
   };
 
+  let authTest = accessToken => {
+    let request =
+      Axios.makeConfigWithUrl(
+        ~url="https://slack.com/api/auth.test",
+        ~_method="POST",
+        ~headers={"Authorization": "Bearer " ++ accessToken},
+        (),
+      );
+
+    Js.Promise.(
+      Axios.request(request) |> then_(result => result##data |> resolve)
+    );
+  };
+
   let makeAuthCallback = code =>
     Axios.get(
       "https://slack.com/api/oauth.access?client_id="

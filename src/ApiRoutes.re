@@ -8,8 +8,32 @@ let requireLogin = (next, req, res) => {
     | None => false
     };
 
-  isLoggedIn ?
-    next(Next.route, res) : Response.sendStatus(Unauthorized, res);
+  let reqJson = Request.asJsonObject(req);
+
+  let headers =
+    switch (Js.Dict.get(reqJson, "headers")) {
+    | Some(h) => h
+    | None => Js_json.object_(Js.Dict.empty())
+    };
+  let token = Json.Decode.(headers |> field("authorization", string));
+
+  Js.Promise.(
+    Slack.IO.authTest(ServerHelpers.getBearerToken(token))
+    |> then_(response => {
+         let isLoggedIn =
+           switch (Js_json.decodeBoolean(response##ok)) {
+           | Some(o) => o
+           | None => false
+           };
+         Js.log2("IsLoggedIn:", isLoggedIn);
+         resolve(isLoggedIn);
+       })
+    |> then_(isLoggedIn =>
+         isLoggedIn
+           ? resolve(next(Next.route, res))
+           : resolve(Response.sendStatus(Unauthorized, res))
+       )
+  );
 };
 
 let slackAuth =
@@ -21,9 +45,16 @@ let slackAuth =
       Js.Promise.(
         Slack.IO.makeAuthCallback(c)
         |> then_(response => {
-             ExpressSession.set(req, "user", response##data##user##id);
+             ExpressSession.set(req, "user", response##data##user_id);
 
-             resolve(Response.sendStatus(Ok, res));
+             resolve(
+               Response.sendJson(
+                 Json.Encode.object_([
+                   ("token", Js.Json.string(response##data##access_token)),
+                 ]),
+                 res,
+               ),
+             );
            })
       )
     | None => Js.Promise.resolve(Response.sendStatus(BadRequest, res))
