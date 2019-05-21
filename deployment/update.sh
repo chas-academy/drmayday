@@ -7,7 +7,7 @@ docker login -u chasschool -p changemepassword
 docker pull chasschool/drmayday:latest
 
 # First time deploy
-docker service update --image chasschool/drmayday:latest --with-registry-auth drmayday_api
+docker service update --image chasschool/drmayday:latest --with-registry-auth drmayday
 
 # Set exit code depending on status
 if [ $? -eq 0 ]
