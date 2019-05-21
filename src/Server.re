@@ -25,9 +25,7 @@ PromiseMiddleware.from(ApiRoutes.requireLogin);
 
 let static_path =
   BsNode.(
-    Node.Global.(
-      Node.Path.join([|__dirname, "../../../", "web", "build", "index.html"|])
-    )
+    Node.Global.(Node.Path.join([|__dirname, "../../../", "web", "build"|]))
   );
 
 App.useOnPath(
@@ -43,7 +41,6 @@ App.useOnPath(
 App.get(app, ~path="/slack/auth") @@ ApiRoutes.slackAuth;
 
 App.get(app, ~path="/api/me") @@ ApiRoutes.me;
-App.get(app, ~path="/api/logout") @@ ApiRoutes.logout;
 
 /* Receives channel events */
 App.post(app, ~path="/event") @@ Routes.event;
@@ -55,19 +52,22 @@ App.post(app, ~path="/actions") @@ Routes.actions;
 App.post(app, ~path="/mayday") @@ Routes.mayday;
 
 /* Serve React-app? */
+App.get(app, ~path="/Index.js") @@
+Middleware.from((_next, _req, res) =>
+  BsNode.(
+    Response.sendFile(
+      Node.Global.(Node.Path.resolve([|static_path, "Index.js"|])),
+      "",
+      res,
+    )
+  )
+);
+
 App.get(app, ~path="*") @@
 Middleware.from((_next, _req, res) =>
   BsNode.(
     Response.sendFile(
-      Node.Global.(
-        Node.Path.resolve([|
-          __dirname,
-          "../../../",
-          "web",
-          "build",
-          "index.html",
-        |])
-      ),
+      Node.Global.(Node.Path.resolve([|static_path, "index.html"|])),
       "",
       res,
     )
@@ -79,7 +79,9 @@ let onListen = e =>
   switch (e) {
   | exception (Js.Exn.Error(e)) =>
     Js.log(e);
+
     Node.Process.exit(1);
+
   | _ => Js.log("Listening at http://localhost:" ++ port->string_of_int)
   };
 
