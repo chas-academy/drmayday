@@ -1,22 +1,7 @@
 open Express;
-open NirenoReasonablyTyped;
 
 let app = express();
 
-App.use(
-  app,
-  ExpressSession.(
-    session(
-      options(
-        ~secret="secret",
-        ~resave=false,
-        ~saveUninitialized=false,
-        ~cookie=cookieOptions(~secure=false, ~maxAge=43200 * 3600, ()),
-        (),
-      ),
-    )
-  ),
-);
 App.use(app, Middleware.json());
 App.use(app, Middleware.urlencoded(~extended=false, ()));
 
