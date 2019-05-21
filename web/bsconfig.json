@@ -1,0 +1,21 @@
+{
+  "name": "dr-mayday",
+  "reason": {
+    "react-jsx": 3
+  },
+  "sources": {
+    "dir": "src",
+    "subdirs": true
+  },
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": false
+    }
+  ],
+  "suffix": ".bs.js",
+  "namespace": true,
+  "bs-dependencies": ["bs-axios", "reason-react", "bs-emotion", "bs-webapi"],
+  "ppx-flags": ["bs-emotion-ppx/ppx"],
+  "refmt": 3
+}
