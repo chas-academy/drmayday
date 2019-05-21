@@ -27,19 +27,26 @@ let tom: HelpItem.t = {
 
 let help_items = [tom, tom, tom];
 
+Utils.Api.me();
+
 [@react.component]
 let make = () => {
-  let url = ReasonReactRouter.useUrl();
+  let next = help_items |> List.hd;
+  let upcoming = help_items |> List.tl;
 
-  let showDashboard = () => <Dashboard />;
-  let showLogin = () => <Login />;
-
-  switch (url.path, Utils.Token.has_token()) {
-  | (["login", token], false) =>
-    Utils.Token.set_token(token);
-    ReasonReactRouter.push("/");
-    showDashboard();
-  | (_, false) => showLogin()
-  | (_, true) => showDashboard()
-  };
+  <div className=Styles.wrap>
+    <h1 className=Typography.h1> {ReasonReact.string("Next")} </h1>
+    <ul className=Styles.item_list> <HelpItem item=next /> </ul>
+    <h1 className=Typography.h1> {ReasonReact.string("Upcoming")} </h1>
+    <ul className=Styles.item_list_upcoming>
+      {React.array(
+         Array.of_list(
+           upcoming
+           |> List.mapi((i, hi) =>
+                <HelpItem key={string_of_int(i)} item=hi />
+              ),
+         ),
+       )}
+    </ul>
+  </div>;
 };

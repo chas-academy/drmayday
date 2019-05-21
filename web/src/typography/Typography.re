@@ -36,7 +36,7 @@ let p_quiet = [%css
     color(`hex(light_text)),
     fontSize(`px(14)),
     fontWeight(400),
-    lineHeight(`pct(100.0)),
+    lineHeight(`pct(150.0)),
     margin(`px(0)),
   ]
 ];

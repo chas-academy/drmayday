@@ -1,5 +1,3 @@
-let component = ReasonReact.statelessComponent(__MODULE__);
-
 module Styles = {
   open Emotion;
 
@@ -45,12 +43,12 @@ module Styles = {
     ]
   ];
 
-  let time_ago = [%css
+  let time_ago = ((bgColor, textColor)) => [%css
     [
       alignItems(`center),
-      backgroundColor(`hex(Typography.warning_light)),
+      backgroundColor(`hex(bgColor)),
       borderRadius(`px(5)),
-      color(`hex(Typography.warning_dark)),
+      color(`hex(textColor)),
       display(`flex),
       height(`px(22)),
       marginLeft(`auto),
@@ -58,13 +56,12 @@ module Styles = {
     ]
   ];
 };
-let get_color = status => {
-  let (background_color, color) =
-    switch (status) {
-    | "warning" => (Typography.warning_dark, Typography.warning_light)
-    };
-  ();
-};
+
+let get_color =
+  fun
+  | "warning" => (Typography.warning_light, Typography.warning_dark)
+  | "danger" => (Typography.danger_light, Typography.danger_dark);
+
 type t = {
   name: string,
   room: string,
@@ -72,30 +69,23 @@ type t = {
   time_ago: string,
 };
 
-let make = (~item, _children) => {
-  ...component,
-
-  render: _self => {
-    <li className=Styles.wrap>
-      <div className=Styles.inner_wrap>
-        <span className=Styles.avatar> {ReasonReact.string("TE")} </span>
-        <div className=Styles.name_room>
-          <p className=Typography.p_lead> {ReasonReact.string(item.name)} </p>
-          <p className=Typography.p_quiet>
-            {item.room |> ReasonReact.string}
-          </p>
-        </div>
-        <span className=Styles.time_ago>
-          <span className=Typography.small_bold>
-            {ReasonReact.string(item.time_ago)}
-          </span>
+[@react.component]
+let make = (~item) => {
+  <li className=Styles.wrap>
+    <div className=Styles.inner_wrap>
+      <span className=Styles.avatar> {React.string("TE")} </span>
+      <div className=Styles.name_room>
+        <p className=Typography.p_lead> {React.string(item.name)} </p>
+        <p className=Typography.p_quiet> {item.room |> React.string} </p>
+      </div>
+      <span className={Styles.time_ago((Typography.warning_light, Typography.warning_dark))}>
+        <span className=Typography.small_bold>
+          {React.string(item.time_ago)}
         </span>
-      </div>
-      <div className=Styles.description_wrap>
-        <p className=Typography.p_quiet>
-          {ReasonReact.string(item.description)}
-        </p>
-      </div>
-    </li>;
-  },
+      </span>
+    </div>
+    <div className=Styles.description_wrap>
+      <p className=Typography.p_quiet> {React.string(item.description)} </p>
+    </div>
+  </li>;
 };

@@ -1,21 +1,21 @@
 {
-  "name": "react-template",
+  "name": "dr-mayday",
   "reason": {
-    "react-jsx": 2
+    "react-jsx": 3
   },
   "sources": {
-    "dir" : "src",
-    "subdirs" : true
+    "dir": "src",
+    "subdirs": true
   },
-  "package-specs": [{
-    "module": "commonjs",
-    "in-source": false
-  }],
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": false
+    }
+  ],
   "suffix": ".bs.js",
   "namespace": true,
-  "bs-dependencies": [
-    "reason-react", "bs-emotion", "bs-webapi"
-  ],
+  "bs-dependencies": ["bs-axios", "reason-react", "bs-emotion", "bs-webapi"],
   "ppx-flags": ["bs-emotion-ppx/ppx"],
   "refmt": 3
 }
