@@ -50,3 +50,36 @@ let mayday =
     | None => Response.sendStatus(BadRequest)
     }
   );
+
+let getToken = req => {
+  let headers =
+    Belt.Option.getWithDefault(
+      Js.Dict.get(Request.asJsonObject(req), "headers"),
+      Js.Json.null,
+    );
+
+  Json.Decode.(headers |> field("authorization", string));
+};
+
+let api =
+  PromiseMiddleware.from((_next, req, res) =>
+    Js.Promise.(
+      switch (Request.bodyJSON(req)) {
+      | Some(body) =>
+        let token = req |> getToken;
+
+        Slack.IO.authTest(ServerHelpers.getBearerToken(token))
+        |> then_(response =>
+             body
+             |> Slack.Api.mapToEvent
+             |> Event.handleApiEvent(~user=response##user)
+             |> then_(data => {
+                  let json = Js.Dict.empty();
+                  Js.Dict.set(json, "data", data);
+                  Response.sendJson(Js.Json.object_(json), res) |> resolve;
+                })
+           );
+      | None => Js.Promise.resolve(Response.sendStatus(BadRequest, res))
+      }
+    )
+  );

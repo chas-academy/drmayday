@@ -28,11 +28,22 @@ let tom: HelpItem.t = {
 let help_items = [tom, tom, tom];
 
 Utils.Api.me();
+Utils.Api.queue(items =>
+  Js.log(Json.Decode.(items |> list(HelpItem.Decode.helpItem)))
+);
 
 [@react.component]
 let make = () => {
   let next = help_items |> List.hd;
-  let upcoming = help_items |> List.tl;
+  let (upcoming, setUpcoming) = React.useState(() => []);
+
+  React.useEffect0(() => {
+    Utils.Api.queue(items =>
+      setUpcoming(_ => items |> HelpItem.Decode.helpItems)
+    );
+
+    None;
+  });
 
   <div className=Styles.wrap>
     <h1 className=Typography.h1> {ReasonReact.string("Next")} </h1>
