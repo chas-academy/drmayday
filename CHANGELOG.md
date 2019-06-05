@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/chas-academy/drmayday/compare/v0.3.0...v0.3.1) (2019-02-01)
+
+
+### Bug Fixes
+
+* resolve issue where wrong queue position was returned ([#26](https://github.com/chas-academy/drmayday/issues/26)) ([d64a38e](https://github.com/chas-academy/drmayday/commit/d64a38e))
+
+
+
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/chas-academy/drmayday/compare/v0.2.0...v0.3.0) (2019-01-31)
+
+
+### Features
+
+* add queue position to response message ([#10](https://github.com/chas-academy/drmayday/issues/10)) ([4dd0aac](https://github.com/chas-academy/drmayday/commit/4dd0aac))
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/chas-academy/drmayday/compare/v0.1.0...v0.2.0) (2019-01-21)
 

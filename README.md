@@ -1,8 +1,8 @@
 # Dr. Mayday
 
-A help bot for Chas Academy.
+[![buddy pipeline](https://app.buddy.works/chas-academy/drmayday/pipelines/pipeline/168037/badge.svg?token=bd6d95c0722525d87413fe6f13408373af7df69b0b3e559a6713e80c9a29b1a8 "buddy pipeline")](https://app.buddy.works/chas-academy/drmayday/pipelines/pipeline/168037)
 
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/chas-academy/drmayday.svg?columns=all)](https://waffle.io/chas-academy/drmayday)
+A help bot for Chas Academy.
 
 ## Table of Contents
 
@@ -74,7 +74,7 @@ You'll need to change the host-adress at the following locations in the Slack AP
 
 ## [Standard](#standards)
 
-- [Semantic commits](https://gist.github.com/lessp/7af7ca9e3a2f3508755dcddfcbc1f15d) 
+- [Semantic commits](https://gist.github.com/lessp/7af7ca9e3a2f3508755dcddfcbc1f15d)
 - [Standard Version](https://github.com/conventional-changelog/standard-version)
 
 ## [Misc](#misc)

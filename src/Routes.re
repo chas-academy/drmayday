@@ -16,7 +16,7 @@ let event =
           switch (event) {
           | Some(e) =>
             Event.handleEvent(e);
-            Response.sendStatus(Ok);
+            Response.sendRawStatus(200);
           | None => Response.sendStatus(BadRequest)
           }
 
@@ -34,7 +34,7 @@ let actions =
       switch (Slack.Action.decodeActionType(body)) {
       | InteractiveMessage =>
         body |> Slack.Action.decodeActionBody |> Action.handleAction;
-        Response.sendStatus(Ok);
+        Response.sendRawStatus(200);
       | UnknownAction => Response.sendStatus(BadRequest)
       }
     | None => Response.sendStatus(BadRequest)
@@ -46,7 +46,7 @@ let mayday =
     switch (Request.bodyJSON(req)) {
     | Some(body) =>
       body |> Slack.Mayday.mapToEvent |> Event.handleEvent;
-      Response.sendStatus(Ok);
+      Response.sendRawStatus(200);
     | None => Response.sendStatus(BadRequest)
     }
   );

@@ -1,4 +1,4 @@
-# Build app
+# Build app 
 FROM node:10.15-alpine as builder
 
 ## Build tools and Git
@@ -11,6 +11,18 @@ WORKDIR /build
 ## Global installation of Reason
 RUN npm install -g --unsafe-perm reason-cli@3.2.0-linux serve
 
+
+# Build client
+FROM node:11.9.0 as web
+
+WORKDIR /web
+
+COPY ./web .
+
+RUN npm ci
+RUN npm run build && npm run webpack:production 
+
+# 
 COPY package*json ./
 COPY bsconfig.json ./bsconfig.json
 COPY ./src ./src
@@ -24,6 +36,7 @@ FROM node:10.15-alpine
 
 WORKDIR /app
 
+COPY --from=web /web/build ./web/build
 COPY --from=builder /build ./
 
 CMD npm run server
