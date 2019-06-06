@@ -42,6 +42,20 @@ module IO = {
     );
   };
 
+  let getUserInfo = accessToken => {
+    let request =
+      Axios.makeConfigWithUrl(
+        ~url="https://slack.com/api/users.identity",
+        ~_method="POST",
+        ~headers={"Authorization": "Bearer " ++ accessToken},
+        (),
+      );
+
+    Js.Promise.(
+      Axios.request(request) |> then_(result => result##data##user |> resolve)
+    );
+  };
+
   let makeAuthCallback = code =>
     Axios.get(
       "https://slack.com/api/oauth.access?client_id="
@@ -217,6 +231,28 @@ module Mayday = {
   };
 };
 
+module Api = {
+  type event = {
+    command: Commands.commands,
+    args: string,
+  };
+
+  let mapToEvent = json =>
+    Json.Decode.{
+      command:
+        Belt.Option.getWithDefault(
+          json |> optional(field("command", string)),
+          "",
+        )
+        |> Commands.decodeCommand,
+      args:
+        Belt.Option.getWithDefault(
+          json |> optional(field("args", string)),
+          "",
+        ),
+    };
+};
+
 module Verification = {
   type t = {
     challenge: string,
@@ -233,6 +269,10 @@ module Verification = {
     let {challenge} = body |> decode;
     challenge;
   };
+};
+
+module Utils = {
+  let encodeUserId = id => "<@" ++ id ++ ">";
 };
 
 module Message = {
@@ -329,8 +369,31 @@ module Message = {
       "```",
     ]
     |> String.concat("\n");
-};
 
-module Utils = {
-  let encodeUserId = id => "<@" ++ id ++ ">";
+  let queue = helpItems =>
+    switch (Belt.Array.length(helpItems)) {
+    | 0 => "Woot. No one on the help list? Nice work!"
+    | _ =>
+      "*Here's the current list of patients:*\n\n"
+      ++ (
+        helpItems->Belt.Array.mapWithIndex(
+          (i, {userId, description, room, timeCreated}: Database.helpItem) =>
+          "*"
+          ++ string_of_int(i + 1)
+          ++ "*. "
+          ++ Utils.encodeUserId(userId)
+          ++ " - "
+          ++ description
+          ++ " - "
+          ++ Database.Utils.formatTimestamp(timeCreated)
+          ++ (
+            switch (room) {
+            | Some(r) => " in *" ++ parseRoom(r) ++ "*"
+            | None => ""
+            }
+          )
+        )
+        |> Js.Array.joinWith("\n")
+      )
+    };
 };

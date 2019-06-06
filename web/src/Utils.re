@@ -29,4 +29,23 @@ module Api = {
     |> then_(response => resolve(Js.log(response##data)))
     |> catch(error => resolve(Js.log(error)));
   };
+
+  let queue = callback => {
+    Js.Promise.(
+      Axios.postDatac(
+        "/api/command",
+        {
+          {
+            "channel_id": "",
+            "command": "queue",
+            "subtype": "human",
+            "args": "",
+          };
+        },
+        Axios.makeConfig(~headers, ()),
+      )
+      |> then_(response => resolve(callback(response##data##data)))
+      |> catch(error => resolve(Js.log(error)))
+    );
+  };
 };

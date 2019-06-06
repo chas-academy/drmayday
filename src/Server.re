@@ -27,6 +27,9 @@ App.get(app, ~path="/slack/auth") @@ ApiRoutes.slackAuth;
 
 App.get(app, ~path="/api/me") @@ ApiRoutes.me;
 
+/* Receives the /mayday command */
+App.post(app, ~path="/api/command") @@ Routes.api;
+
 /* Receives channel events */
 App.post(app, ~path="/event") @@ Routes.event;
 

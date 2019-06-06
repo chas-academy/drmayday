@@ -39,40 +39,11 @@ let next = (isAdmin, sendMessage, sendMessageWithAttachments) =>
     sendMessage("Hey, this is restricted to teachers! :face_with_monocle:")
     |> ignore;
 
-let getOpenItems = sendMessage =>
+let getOpenItems = callback =>
   Database.getOpenItems()
-  |> then_((helpItems: array(Database.helpItem)) => {
-       let message =
-         switch (Belt.Array.length(helpItems)) {
-         | 0 => "Woot. No one on the help list? Nice work!"
-         | _ =>
-           "*Here's the current list of patients:*\n\n"
-           ++ (
-             helpItems->Belt.Array.mapWithIndex(
-               (i, {userId, description, room, timeCreated}) =>
-               "*"
-               ++ string_of_int(i + 1)
-               ++ "*. "
-               ++ Slack.Utils.encodeUserId(userId)
-               ++ " - "
-               ++ description
-               ++ " - "
-               ++ Database.Utils.formatTimestamp(timeCreated)
-               ++ (
-                 switch (room) {
-                 | Some(r) => " in *" ++ Slack.Message.parseRoom(r) ++ "*"
-                 | None => ""
-                 }
-               )
-             )
-             |> Js.Array.joinWith("\n")
-           )
-         };
-
-       sendMessage(message);
-       resolve();
-     })
-  |> ignore;
+  |> then_((helpItems: array(Database.helpItem)) =>
+       resolve(callback(helpItems))
+     );
 
 let markAsFinished = (itemId, sendMessage) =>
   switch (itemId) {

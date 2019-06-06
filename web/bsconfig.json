@@ -15,7 +15,13 @@
   ],
   "suffix": ".bs.js",
   "namespace": true,
-  "bs-dependencies": ["bs-axios", "reason-react", "bs-emotion", "bs-webapi"],
+  "bs-dependencies": [
+    "@glennsl/bs-json",
+    "bs-axios",
+    "reason-react",
+    "bs-emotion",
+    "bs-webapi"
+  ],
   "ppx-flags": ["bs-emotion-ppx/ppx"],
   "refmt": 3
 }

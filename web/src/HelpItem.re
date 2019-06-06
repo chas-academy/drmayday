@@ -69,6 +69,18 @@ type t = {
   time_ago: string,
 };
 
+module Decode = {
+  let helpItem = json =>
+    Json.Decode.{
+      description: json |> field("description", string),
+      name: json |> field("user_id", string),
+      room: json |> field("room", string),
+      time_ago: json |> field("time_created", int) |> string_of_int,
+    };
+
+  let helpItems = items => Json.Decode.(items |> list(helpItem));
+};
+
 [@react.component]
 let make = (~item) => {
   <li className=Styles.wrap>
@@ -78,7 +90,11 @@ let make = (~item) => {
         <p className=Typography.p_lead> {React.string(item.name)} </p>
         <p className=Typography.p_quiet> {item.room |> React.string} </p>
       </div>
-      <span className={Styles.time_ago((Typography.warning_light, Typography.warning_dark))}>
+      <span
+        className={Styles.time_ago((
+          Typography.warning_light,
+          Typography.warning_dark,
+        ))}>
         <span className=Typography.small_bold>
           {React.string(item.time_ago)}
         </span>

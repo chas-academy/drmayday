@@ -3,3 +3,5 @@
 external distanceInWordsToNow: Js.Date.t => string = "";
 [@bs.module "date-fns"]
 external distanceInWords: (Js.Date.t, Js.Date.t) => string = "";
+[@bs.module "date-fns"]
+external differenceInHours: (Js.Date.t, Js.Date.t) => string = "";
