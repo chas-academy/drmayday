@@ -37,7 +37,7 @@
     "bs-node": "github:reasonml-community/bs-node",
     "date-fns": "^1.29.0",
     "dotenv": "^6.1.0",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "express-session": "^1.15.6",
     "jsonwebtoken": "8.5.0"
   },
